@@ -21,12 +21,13 @@ UserAuth.post("/user_register", asyncHandler(async (req, res) => {
     if (!email) return res.json({ msg: "Your email cannot be empty" });
     if (!password) return res.json({ msg: "Password cannot be empty" });
 
-    if (!req.files || !req.files.userPhoto) {
-      return res.json({ msg: "No file uploaded" });
-    }
+    
+    // if (!req.files || !req.files.userPhoto) {
+    //   return res.json({ msg: "No file uploaded" });
+    // }
 
     // Upload user photo to Cloudinary
-    const photoResult = await cloudinary.uploader.upload(req.files.userPhoto.tempFilePath);
+    // const photoResult = await cloudinary.uploader.upload(req.files.userPhoto.tempFilePath);
 
     // Check if email already exists
     const emailExists = await User.findOne({ email });
@@ -38,10 +39,10 @@ UserAuth.post("/user_register", asyncHandler(async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Save user to database
+    // Save user to database  userPhoto: photoResult.secure_url, // Save the image URL only
     const user = new User({
       fullname,
-      userPhoto: photoResult.secure_url, // Save the image URL only
+     
       email,
       password: hashedPassword,
     });
@@ -49,7 +50,7 @@ UserAuth.post("/user_register", asyncHandler(async (req, res) => {
     await user.save();
 
     // Remove temporary file
-    fs.unlinkSync(req.files.userPhoto.tempFilePath);
+    // fs.unlinkSync(req.files.userPhoto.tempFilePath);
 
     res.json({ msg: "Your account has been successfully created!" });
   } catch (error) {
@@ -57,5 +58,33 @@ UserAuth.post("/user_register", asyncHandler(async (req, res) => {
     res.json({ msg: `There was an error: ${error.message}` });
   }
 }));
+
+
+const users = [
+  {
+    id: 1,
+    name: 'John Doe',
+    email: 'johndoe@example.com',
+    age: 25,
+  },
+  {
+    id: 2,
+    name: 'Jane Smith',
+    email: 'janesmith@example.com',
+    age: 30,
+  },
+  {
+    id: 3,
+    name: 'Alice Johnson',
+    email: 'alicej@example.com',
+    age: 22,
+  },
+];
+
+
+
+UserAuth.get('/api/users', (req, res) => {
+  res.json(users); // Sends the JSON objects to the client
+});
 
 module.exports = UserAuth;

@@ -7,10 +7,10 @@ const UserSchema = mongoose.Schema({
         required: true
     },
 
-    userPhoto: {
-        type: String,
-        required: true
-    },
+    // userPhoto: {
+    //     type: String,
+    //     required: true
+    // },
 
     email: {
         type: String,
