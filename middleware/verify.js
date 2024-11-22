@@ -14,7 +14,7 @@ const verify = asyncHandler(async (req, res, next) => {
       usertoken = req.headers.authorization.split(' ')[1]
 
       // Verify token
-      const decoded = jwt.verify(usertoken, process.env.ACCESS_TOKEN_USER)
+      const decoded = jwt.verify(usertoken, process.env.ACCESS_TOKEN)
 
       // Get user from the token
       req.user = await User.findById(decoded.id).select('-password')

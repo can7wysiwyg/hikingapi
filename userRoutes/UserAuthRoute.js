@@ -60,31 +60,76 @@ UserAuth.post("/user_register", asyncHandler(async (req, res) => {
 }));
 
 
-const users = [
-  {
-    id: 1,
-    name: 'John Doe',
-    email: 'johndoe@example.com',
-    age: 25,
-  },
-  {
-    id: 2,
-    name: 'Jane Smith',
-    email: 'janesmith@example.com',
-    age: 30,
-  },
-  {
-    id: 3,
-    name: 'Alice Johnson',
-    email: 'alicej@example.com',
-    age: 22,
-  },
-];
+UserAuth.post("/user_login", asyncHandler(async(req, res) => {
+  const { email, password } = req.body;
+
+  const userExists = await User.findOne({ email }).select("+password");
+  
+
+  if (!userExists) {
+    res.json({
+      msg: "No user associated with this email exists in our system. Please register.",
+    });
+  }
+
+  const passwordMatch = await bcrypt.compare(password, userExists.password);
+
+  if (passwordMatch) {
+    // let accesstoken = createAccessToken({id: userExists._id })
+    let refreshtoken = createRefreshToken({id: userExists._id})
+
+    res.cookie('refreshtoken', refreshtoken, { expire: new Date() + 9999 });
+
+    jwt.verify(refreshtoken, process.env.REFRESH_TOKEN, (err, user) =>{
+      if(err) return res.status(400).json({msg: "Please Login or Register"})
+  
+      const accesstoken = createAccessToken({id: user.id})
+      
+  
+      res.json({accesstoken}) })
+
+
+    
+  } else {
+    res.json({ msg: "check your password again" });
+  } 
+
+
+  
+}))
 
 
 
-UserAuth.get('/api/users', (req, res) => {
-  res.json(users); // Sends the JSON objects to the client
-});
+UserAuth.get('/auth/user',verify, asyncHandler(async(req, res) => {
+  try{
+    const user = await User.findById(req.user).select('-password')
+    if(!user) return res.json({msg: "User does not exist."})
+  
+    res.json({user})
+  // console.log(user);
+  
+  // res.json(req.user)
+  
+  }
+    catch(err) {
+      return res.json({msg: err.message})
+  
+  
+    }
+  
+  
+  }))
+
+
+
+
+const createAccessToken = (user) =>{
+  return jwt.sign(user, process.env.ACCESS_TOKEN, {expiresIn: '7d'})
+}
+const createRefreshToken = (user) =>{
+  return jwt.sign(user, process.env.REFRESH_TOKEN, {expiresIn: '7d'})
+}
+
+
 
 module.exports = UserAuth;
