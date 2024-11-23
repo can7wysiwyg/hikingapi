@@ -4,14 +4,6 @@ const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const verify = require("../middleware/verify");
-const fs = require("fs");
-const cloudinary = require("cloudinary").v2;
-
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET,
-});
 
 UserAuth.post("/user_register", asyncHandler(async (req, res) => {
   try {
@@ -22,12 +14,7 @@ UserAuth.post("/user_register", asyncHandler(async (req, res) => {
     if (!password) return res.json({ msg: "Password cannot be empty" });
 
     
-    // if (!req.files || !req.files.userPhoto) {
-    //   return res.json({ msg: "No file uploaded" });
-    // }
-
-    // Upload user photo to Cloudinary
-    // const photoResult = await cloudinary.uploader.upload(req.files.userPhoto.tempFilePath);
+   
 
     // Check if email already exists
     const emailExists = await User.findOne({ email });
@@ -39,7 +26,7 @@ UserAuth.post("/user_register", asyncHandler(async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Save user to database  userPhoto: photoResult.secure_url, // Save the image URL only
+   
     const user = new User({
       fullname,
      
@@ -49,9 +36,7 @@ UserAuth.post("/user_register", asyncHandler(async (req, res) => {
 
     await user.save();
 
-    // Remove temporary file
-    // fs.unlinkSync(req.files.userPhoto.tempFilePath);
-
+    
     res.json({ msg: "Your account has been successfully created!" });
   } catch (error) {
     console.error(`Error during registration: ${error}`);
@@ -75,7 +60,7 @@ UserAuth.post("/user_login", asyncHandler(async(req, res) => {
   const passwordMatch = await bcrypt.compare(password, userExists.password);
 
   if (passwordMatch) {
-    // let accesstoken = createAccessToken({id: userExists._id })
+    
     let refreshtoken = createRefreshToken({id: userExists._id})
 
     res.cookie('refreshtoken', refreshtoken, { expire: new Date() + 9999 });
@@ -106,9 +91,7 @@ UserAuth.get('/auth/user',verify, asyncHandler(async(req, res) => {
     if(!user) return res.json({msg: "User does not exist."})
   
     res.json({user})
-  // console.log(user);
   
-  // res.json(req.user)
   
   }
     catch(err) {

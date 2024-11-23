@@ -7,6 +7,8 @@ const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const fileUpload = require('express-fileupload')
 const UserAuth = require('./userRoutes/UserAuthRoute')
+const UserUpdateRoute = require('./userRoutes/UserUpdateRoute')
+const DriverInfoRoute = require('./driverRoutes/DriverInfoRoute')
 
 
 
@@ -31,6 +33,8 @@ db.once('open', function(){
   
 
 app.use(UserAuth)
+app.use(UserUpdateRoute)
+app.use(DriverInfoRoute)
   
 
 
