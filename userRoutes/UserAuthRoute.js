@@ -7,13 +7,15 @@ const verify = require("../middleware/verify");
 
 UserAuth.post("/user_register", asyncHandler(async (req, res) => {
   try {
-    const { fullname, email, password } = req.body;
+    const { fullname, email, password, phone } = req.body;
 
     if (!fullname) return res.json({ msg: "Your name cannot be empty" });
     if (!email) return res.json({ msg: "Your email cannot be empty" });
     if (!password) return res.json({ msg: "Password cannot be empty" });
+    if (!phone) return res.json({ msg: "Phone number cannot be empty" });
 
-    
+
+   console.log(fullname) 
    
 
     // Check if email already exists
@@ -29,7 +31,7 @@ UserAuth.post("/user_register", asyncHandler(async (req, res) => {
    
     const user = new User({
       fullname,
-     
+     phone,
       email,
       password: hashedPassword,
     });
