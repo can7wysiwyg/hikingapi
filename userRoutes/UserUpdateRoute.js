@@ -34,6 +34,8 @@ UserUpdateRoute.put(
           if (!userPhoto) {
             return res.json({ msg: "No image was selected." });
           }
+
+          console.log(userPhoto)
       
           const result = await cloudinary.uploader.upload(userPhoto.tempFilePath);
           
@@ -58,7 +60,7 @@ UserUpdateRoute.put(
         const { id } = req.params;
         const Owner = await User.findById(req.user); // Fetch authenticated user
         const userId = Owner._id.toString();
-  
+        console.log(req.body)
         if (userId !== id) {
           return res.json({ msg: "Hacking attacks are not tolerated" });
         }

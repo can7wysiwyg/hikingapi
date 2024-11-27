@@ -9,6 +9,8 @@ const fileUpload = require('express-fileupload')
 const UserAuth = require('./userRoutes/UserAuthRoute')
 const UserUpdateRoute = require('./userRoutes/UserUpdateRoute')
 const DriverInfoRoute = require('./driverRoutes/DriverInfoRoute')
+const DriversPublicRoute = require('./public/DriversPublicRoute')
+const { default: axios } = require('axios')
 
 
 
@@ -35,6 +37,38 @@ db.once('open', function(){
 app.use(UserAuth)
 app.use(UserUpdateRoute)
 app.use(DriverInfoRoute)
+app.use(DriversPublicRoute)
+
+
+app.get('/api/reverse-geocode', async (req, res) => {
+  const { latitude, longitude } = req.query;
+  
+  try {
+    // Send a reverse geocode request to Nominatim
+    const response = await axios.get('https://nominatim.openstreetmap.org/reverse', {
+      params: {
+        lat: latitude,        // Latitude
+        lon: longitude,       // Longitude
+        format: 'json',       // Response format
+        addressdetails: 1,    // Include address details
+      },
+      headers: {
+        'User-Agent': 'YourAppName', // Set a User-Agent to identify your app
+      },
+    });
+
+    if (response.data && response.data.address) {
+      const address = response.data.address;
+      res.json({ address: address });
+    } else {
+      res.status(404).json({ error: 'Address not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching address:', error.message);
+    res.status(500).json({ error: 'Error fetching address from Nominatim' });
+  }
+});
+
   
 
 

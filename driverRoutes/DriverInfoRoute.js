@@ -33,9 +33,11 @@ DriverInfoRoute.post('/driver_info_create', verify, verifyDriver, asyncHandler(a
                 driverCarPlate, 
                 driverName: req.user.id,
               });
-            
+
+             
                          
                 const driverCarPhoto = req.files.driverCarPhoto;
+                console.log(driverCarPhoto)
                 const result = await cloudinary.uploader.upload(driverCarPhoto.tempFilePath);
             
                 
