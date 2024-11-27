@@ -36,5 +36,66 @@ DriversPublicRoute.get('/drivers_show_all', asyncHandler(async(req, res) => {
 }))
 
 
+DriversPublicRoute.get(
+    '/single_driver/:id',
+    asyncHandler(async (req, res) => {
+      try {
+        const { id } = req.params;
+  
+        // Fetch the driver details using the `Driver` model
+        const driver = await Driver.findOne({driverName: id});
+  
+        if (!driver) {
+          return res.status(404).json({ msg: 'Driver not found' });
+        }
+  
+        // Fetch user details using the associated User ID
+        const user = await User.findById(driver.driverName); // Replace `userId` with the correct field in the Driver model linking to the User model
+  
+        if (!user) {
+          return res.status(404).json({ msg: 'User not found for this driver' });
+        }
+  
+        // Combine relevant driver and user details
+        const driverDetails = {
+         userPhoto: user.userPhoto,
+          fullname: user.fullname,
+          phone: user.phone,
+          email: user.email,
+          userLocation: user.userLocation,
+          driverCarPlate: driver.driverCarPlate,
+          driverCarCapacity: driver.driverCarCapacity,
+          driverCarPhoto: driver.driverCarPhoto,
+          // Add other fields from the Driver model as needed
+        };
+  
+        // Respond with the combined driver details
+        res.json(driverDetails);
+      } catch (error) {
+        res.status(500).json({
+          msg: `There was an error while fetching the driver: ${error.message}`,
+        });
+      }
+    })
+  );
+  
+
+ 
+DriversPublicRoute.get('/taxi_single/:id', asyncHandler(async(req, res) => {
+
+    try {
+
+        const {id} = req.params
+
+        const taxi = await Driver.findById(id)
+
+        res.json(taxi)
+        
+    } catch (error) {
+        res.json({msg: `there was an error: ${error.message}`})
+    }
+
+
+}))  
 
 module.exports = DriversPublicRoute
