@@ -66,6 +66,7 @@ DriversPublicRoute.get(
           driverCarPlate: driver.driverCarPlate,
           driverCarCapacity: driver.driverCarCapacity,
           driverCarPhoto: driver.driverCarPhoto,
+          driverId: driver._id
         
         };
   
