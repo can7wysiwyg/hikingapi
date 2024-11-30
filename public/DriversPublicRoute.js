@@ -56,7 +56,7 @@ DriversPublicRoute.get(
           return res.status(404).json({ msg: 'User not found for this driver' });
         }
   
-        // Combine relevant driver and user details
+        
         const driverDetails = {
          userPhoto: user.userPhoto,
           fullname: user.fullname,
@@ -66,7 +66,7 @@ DriversPublicRoute.get(
           driverCarPlate: driver.driverCarPlate,
           driverCarCapacity: driver.driverCarCapacity,
           driverCarPhoto: driver.driverCarPhoto,
-          // Add other fields from the Driver model as needed
+        
         };
   
         // Respond with the combined driver details
