@@ -10,6 +10,7 @@ const UserAuth = require('./userRoutes/UserAuthRoute')
 const UserUpdateRoute = require('./userRoutes/UserUpdateRoute')
 const DriverInfoRoute = require('./driverRoutes/DriverInfoRoute')
 const DriversPublicRoute = require('./public/DriversPublicRoute')
+const UserDriver = require('./userRoutes/UserDriver')
 const { default: axios } = require('axios')
 
 
@@ -38,6 +39,7 @@ app.use(UserAuth)
 app.use(UserUpdateRoute)
 app.use(DriverInfoRoute)
 app.use(DriversPublicRoute)
+app.use(UserDriver)
 
 
 app.get('/api/reverse-geocode', async (req, res) => {
