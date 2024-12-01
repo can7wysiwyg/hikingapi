@@ -64,7 +64,7 @@ DriverInfoRoute.put(
   asyncHandler(async (req, res) => {
     try {
       const { id } = req.params;
-      const driver = await Driver.findById(id);
+      const driver = await Driver.findByOne({driverName: id});
 
       const owned = await User.findById(req.user);
 
@@ -106,7 +106,7 @@ DriverInfoRoute.put(
 try {
 
   const {id} = req.params
-  const driver = await Driver.findById(id);
+  const driver = await Driver.findOne({driverName: id});
 
       const owned = await User.findById(req.user);
 
