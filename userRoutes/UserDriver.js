@@ -21,8 +21,8 @@ UserDriver.post(
      
 
     
-      if (!req.files || !req.files.idPhotoFront || !req.files.idPhotoBack) {
-        return res.status(400).json({ msg: 'Both ID photos are required.' });
+      if (!req.files || !req.files.idPhotoFront || !req.files.idPhotoBack || !req.files.drivingLicence) {
+        return res.status(400).json({ msg: 'all photos are required.' });
       }
 
       
@@ -36,17 +36,23 @@ UserDriver.post(
         { folder: 'user_driver_verification' }
       );
 
+      const drivingLicence = await cloudinary.uploader.upload(
+        req.files.drivingLicence.tempFilePath,
+        { folder: 'user_driver_verification' }
+      );
+
+
       
-      const newVerification = await DriverVeri.create({
+       await DriverVeri.create({
 
         userName: id,
         idPhotoFront: idPhotoFront.secure_url,
         idPhotoBack: idPhotoBack.secure_url,
+        drivingLicence: drivingLicence.secure_url
       });
 
       res.status(201).json({
         msg: 'User driver verification uploaded successfully.',
-        verification: newVerification,
       });
     } catch (error) {
       res.status(500).json({ msg: `There was an error: ${error.message}` });

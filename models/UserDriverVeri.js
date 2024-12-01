@@ -11,6 +11,14 @@ const UserDriverVerificationSchema = mongoose.Schema({
         type: String,
         required: true
     },
+
+    drivingLicence: {
+        type: String,
+        required: true
+
+
+    },
+
     userName: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'

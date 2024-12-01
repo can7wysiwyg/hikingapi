@@ -89,8 +89,7 @@ DriverInfoRoute.put(
         driverCarPhoto.tempFilePath
       );
 
-      console.log(result)
-
+     
       await Driver.findByIdAndUpdate(driver._id, { driverCarPhoto: result.secure_url });
 
       res.json({ msg: " successfully updated." });
