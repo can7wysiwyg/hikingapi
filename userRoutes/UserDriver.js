@@ -23,7 +23,11 @@ UserDriver.post(
 
       const veriExistence = await DriverVeri.findOne({userName: id})
 
-      if(veriExistence) res.json({msg: "you have already sent your verification. Please wait as we process it."})
+      if(veriExistence){
+
+  return res.json({msg: "verification exists!"})
+
+      } 
 
     
       if (!req.files || !req.files.idPhotoFront || !req.files.idPhotoBack || !req.files.drivingLicence) {
