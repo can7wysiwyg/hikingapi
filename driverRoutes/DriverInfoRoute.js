@@ -64,9 +64,11 @@ DriverInfoRoute.put(
   asyncHandler(async (req, res) => {
     try {
       const { id } = req.params;
-      const driver = await Driver.findOne({driverName: id});
+       const driver = await Driver.findOne({driverName: id});
 
       const owned = await User.findById(req.user);
+
+      
 
       if (driver.driverName.toString() !== owned._id.toString()) {
         return res.json({ msg: "Access is denied." });
@@ -77,6 +79,7 @@ DriverInfoRoute.put(
       }
 
       const driverCarPhoto = req.files.driverCarPhoto;
+      
 
       if (!driverCarPhoto) {
         return res.json({ msg: "No image was selected." });
@@ -86,12 +89,14 @@ DriverInfoRoute.put(
         driverCarPhoto.tempFilePath
       );
 
-      await Driver.findByIdAndUpdate(id, { driverCarPhoto: result.secure_url });
+      console.log(result)
+
+      await Driver.findByIdAndUpdate(driver._id, { driverCarPhoto: result.secure_url });
 
       res.json({ msg: " successfully updated." });
     } catch (error) {
       res.json({
-        msg: `there was a problem while updating the car photo: ${error.message}`,
+        msg: `there was a problem while updating the car photo: ${error}`,
       });
     }
   })
