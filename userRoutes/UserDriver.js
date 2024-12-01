@@ -20,6 +20,11 @@ UserDriver.post(
       const { id } = req.params; 
      
 
+
+      const veriExistence = await DriverVeri.findOne({userName: id})
+
+      if(veriExistence) res.json({msg: "you have already sent your verification. Please wait as we process it."})
+
     
       if (!req.files || !req.files.idPhotoFront || !req.files.idPhotoBack || !req.files.drivingLicence) {
         return res.status(400).json({ msg: 'all photos are required.' });
@@ -61,5 +66,23 @@ UserDriver.post(
 );
 
 
+UserDriver.get('/check_verification_existence/:id', verify, asyncHandler(async(req, res) => {
+
+
+  try {
+    const {id} = req.params
+
+
+    const verification = await DriverVeri.findOne({userName: id})
+
+    res.json({verification})
+
+
+    
+  } catch (error) {
+    res.json({msg: `there was a problem: ${error.message}`})
+  }
+
+}))
 
 module.exports = UserDriver;
