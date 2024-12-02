@@ -157,6 +157,7 @@ UserAuth.post("/resend_verification", asyncHandler(async (req, res) => {
 
 
 
+
 UserAuth.post("/user_login", asyncHandler(async(req, res) => {
   const { email, password } = req.body;
 
@@ -215,6 +216,100 @@ UserAuth.get('/auth/user',verify, asyncHandler(async(req, res) => {
   
   }))
 
+
+
+
+  UserAuth.post('/user_forgot_password', asyncHandler(async (req, res) => {
+    try {
+      const { email } = req.body;
+  
+      if (!email) {
+        return res.status(400).json({ msg: "Field cannot be empty." });
+      }
+  
+      const user = await User.findOne({ email });
+  
+      if (!user) {
+        return res.status(404).json({ msg: "No user with this email address exists." });
+      }
+  
+      // Generate a verification code
+      const verificationCode = crypto.randomInt(100000, 999999); // 6-digit code
+      const codeExpiration = Date.now() + 3600000; // Code valid for 1 hour
+  
+      // Save the code and expiration to the database
+      user.passwordResetCode = verificationCode;
+      user.passwordResetCodeExpires = codeExpiration;
+      await user.save();
+  
+      // Send the code via email
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      });
+  
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'Password Reset Code',
+        text: `Your password reset code is: ${verificationCode}. It will expire in 1 hour.`,
+      };
+  
+      await transporter.sendMail(mailOptions);
+  
+      res.status(200).json({ msg: "Password reset code sent to your email." });
+  
+    } catch (error) {
+      res.status(500).json({ msg: `There was a problem: ${error.message}` });
+    }
+  }));
+
+
+
+  UserAuth.post('/reset_password', asyncHandler(async (req, res) => {
+    try {
+      const { email, newPassword, code } = req.body;
+  
+      if (!email || !newPassword || !code) {
+        return res.status(400).json({ msg: "Fields cannot be empty." });
+      }
+  
+      const user = await User.findOne({ email });
+  
+      if (!user) {
+        return res.status(404).json({ msg: "No user with this email address exists." });
+      }
+  
+      // Check if the code matches and is not expired
+      if (user.passwordResetCode !== parseInt(code) || Date.now() > user.passwordResetCodeExpires) {
+        return res.status(400).json({ msg: "Invalid or expired code." });
+      }
+  
+      // Hash the new password and update the user's record
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+      user.password = hashedPassword;
+  
+      // Clear the reset code and expiration
+      user.passwordResetCode = null;
+      user.passwordResetCodeExpires = null;
+  
+      await user.save();
+  
+      res.status(200).json({ msg: "Password reset successfully." });
+  
+    } catch (error) {
+      res.status(500).json({ msg: `There was a problem: ${error.message}` });
+    }
+  }));
+  
+  
+
+
+  
 
 
 
