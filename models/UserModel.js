@@ -31,11 +31,11 @@ const UserSchema = mongoose.Schema({
         default: null
     },
     passwordResetCode: {
-        type: Number, // For a numeric reset code
+        type: Number, 
         default: null
     },
     passwordResetCodeExpires: {
-        type: Date, // Stores the expiration time as a Date object
+        type: Date, 
         default: null
     }
 }, {
