@@ -157,7 +157,7 @@ MessagingRoute.post('/start_conversation', verify, asyncHandler(async(req, res) 
 // }
 
 
-MessageRoute.post('/send_message', asyncHandler(async (req, res) => {
+MessagingRoute.post('/send_message', asyncHandler(async (req, res) => {
   try {
     const { conversationId, senderId, content, receiverId, receiverToken } = req.body;
 
@@ -232,7 +232,7 @@ MessagingRoute.get('/conversations/:id', verify,  asyncHandler(async (req, res) 
 }));
 
 
-MessagingRoutepost('/save_push_token', asyncHandler(async (req, res) => {
+MessagingRoute.post('/save_push_token', asyncHandler(async (req, res) => {
   try {
     const { token, userId } = req.body;
 
