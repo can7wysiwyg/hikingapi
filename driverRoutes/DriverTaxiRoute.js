@@ -46,6 +46,25 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
   });
 
 
+  DriverTaxiRoute.get('/driver_see_my_routes/:id', verify, verifyDriver, async(req, res) => {
+
+
+    try {
+        const {id} = req.params
+
+        const myRoutes = await TaxiRoute.find({driverId: id})
+
+        res.json(myRoutes)
+        
+    } catch (error) {
+
+        res.status(500).json({ success: false, message: error.message });
+        
+    }
+
+  })
+
+
   module.exports = DriverTaxiRoute
   
   
