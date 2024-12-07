@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 
 const bookingSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
-  pickupLocation: { type: String, required: true },
-  dropOffLocation: { type: String, required: true },
-  fare: { type: Number, required: true },
+  pickupLocation: { type: String },
+  dropOffLocation: { type: String },
+  fare: { type: Number, },
   bookingTime: { type: Date, default: Date.now },
 });
 
