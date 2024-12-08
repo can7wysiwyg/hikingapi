@@ -18,7 +18,14 @@ DriverInfoRoute.post(
   verifyDriver,
   asyncHandler(async (req, res) => {
     try {
-      const { driverCarPlate, driverCarCapacity } = req.body;
+
+  const alreadyExists = await Driver.findOne({driverName: req.user.id})
+
+  if(alreadyExists) {
+    return res.json({msg: "action not possible! you are already registered!"})
+  }
+
+      const { driverCarPlate, driverCarCapacity, vehicleType } = req.body;
 
       if (!driverCarPlate)
         res.json({ msg: "car number plate cannot be empty" });
@@ -28,6 +35,12 @@ DriverInfoRoute.post(
           msg: "you should specify the number of people your car carries",
         });
 
+        if (!vehicleType || !["bus", "taxi"].includes(vehicleType.toLowerCase())) {
+          return res.json({ msg: "Invalid vehicle type. Must be 'bus' or 'taxi'." });
+        }
+  
+        
+
       if (!req.files || !req.files.driverCarPhoto) {
         return res.json({ msg: "your car Photo is required." });
       }
@@ -36,6 +49,8 @@ DriverInfoRoute.post(
         driverCarCapacity,
         driverCarPlate,
         driverName: req.user.id,
+        vehicleType: vehicleType.toLowerCase(), 
+
       });
 
       const driverCarPhoto = req.files.driverCarPhoto;

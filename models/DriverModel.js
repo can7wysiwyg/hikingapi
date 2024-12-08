@@ -19,6 +19,12 @@ const DriverSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    vehicleType: {
+        type: String,
+        enum: ['bus', 'taxi'],
+        required: true, 
+      },
+  
 
 
 }, {
