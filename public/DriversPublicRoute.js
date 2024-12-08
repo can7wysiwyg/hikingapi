@@ -10,9 +10,9 @@ DriversPublicRoute.get('/taxis_show_all', asyncHandler(async(req, res) => {
     try {
 
     
-        const  drivers = await Driver.find();  
+        const  taxis = await Driver.find();  
       
-      res.json({ drivers });
+      res.json({ taxis });
 
         
         
