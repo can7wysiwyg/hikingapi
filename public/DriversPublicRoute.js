@@ -5,26 +5,13 @@ const asyncHandler = require('express-async-handler')
 
 
 DriversPublicRoute.get('/taxis_show_all', asyncHandler(async(req, res) => {
-  const { vehicleType } = req.query;  // Get the vehicleType query parameter
-
+  
 
     try {
 
-      let drivers = [];
-
-      // Handle the vehicleType filter for drivers
-      if (vehicleType === 'taxi') {
-          drivers = await Driver.find({ vehicleType: 'taxi' });  // Filter drivers based on vehicleType
-      } else if (vehicleType === 'bus') {
-          drivers = await Driver.find({ vehicleType: 'bus' }); // Filter drivers based on vehicleType
-      } else {
-          return res.status(400).json({ msg: "Invalid vehicle type. Please select 'taxi' or 'bus'." });
-      }
-
-      if (!drivers.length) {
-          return res.status(404).json({ msg: `No drivers found for ${vehicleType}s.` });
-      }
-
+    
+        const  drivers = await Driver.find();  
+      
       res.json({ drivers });
 
         
