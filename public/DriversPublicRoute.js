@@ -27,7 +27,7 @@ DriversPublicRoute.get('/drivers_show_all', asyncHandler(async(req, res) => {
 
     try {
 
-        const drivers = await User.find({role: 11}).sort({_id: -1})
+        const drivers = await User.find({role: 11}).select("_id fullname userPhoto")
 
         res.json({drivers})
 
