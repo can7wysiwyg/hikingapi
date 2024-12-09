@@ -14,7 +14,7 @@ const deliverySchema = new mongoose.Schema({
   },
 
 
-  owner: {
+  driverName: {
  type: mongoose.Schema.Types.ObjectId,
  ref: 'User'
 
