@@ -54,7 +54,7 @@ DriverInfoRoute.post(
       });
 
       const driverCarPhoto = req.files.driverCarPhoto;
-      console.log(driverCarPhoto);
+    
       const result = await cloudinary.uploader.upload(
         driverCarPhoto.tempFilePath
       );

@@ -16,6 +16,8 @@ const MessagingRoute = require('./messaging/MessagingRoute')
 const AllUsersRoute = require('./public/AllUsersRoute')
 const UserRidesRoute = require('./userRoutes/UserRidesRoute')
 const DriverTaxiRoute = require('./driverRoutes/DriverTaxiRoute')
+const DeliverDriverRoute = require('./deliveries/DeliverDriverRoute')
+const DeliverPublicRoute = require('./deliveries/DeliveryPublicRoute')
 
 
 
@@ -48,6 +50,8 @@ app.use(MessagingRoute)
 app.use(AllUsersRoute)
 app.use(UserRidesRoute)
 app.use(DriverTaxiRoute)
+app.use(DeliverDriverRoute)
+app.use(DeliverPublicRoute)
 
 
 app.get('/api/reverse-geocode', async (req, res) => {
