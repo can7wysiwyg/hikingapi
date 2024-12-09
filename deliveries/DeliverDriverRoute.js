@@ -49,7 +49,7 @@ DeliverDriverRoute.post('/upload_delivery_car', verify, verifyDriver, asyncHandl
         vehicleType,
         packageSize,
         loadWeight,
-        owner: req.user.id
+        driverName: req.user.id
 
 
       })    

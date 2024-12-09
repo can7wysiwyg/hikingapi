@@ -1,7 +1,7 @@
 const DeliverPublicRoute = require('express').Router()
 const Delivery = require('../models/DeliveryCarModel')
 const asyncHandler = require('express-async-handler')
-
+const User = require('../models/UserModel')
 
 DeliverPublicRoute.get('/show_deliver_cars', asyncHandler(async(req, res) => {
 
@@ -13,8 +13,61 @@ DeliverPublicRoute.get('/show_deliver_cars', asyncHandler(async(req, res) => {
         res.json({cars})
         
     } catch (error) {
-        res.json({msg: "there was a problem while displaying this data"})
+        res.json({msg: `there was a problem while displaying this data: ${error.message}`})
     }
+
+}))
+
+
+DeliverPublicRoute.get('/get_single_deliverer/:id', asyncHandler(async(req, res) => {
+
+    try {
+
+        const {id} = req.params
+
+        const driver = await Delivery.findOne({driverName: id});
+
+
+        if (!driver) {
+            return res.status(404).json({ msg: 'Driver not found' });
+          }
+    
+          
+          const user = await User.findById(driver.driverName); 
+    
+          if (!user) {
+            return res.status(404).json({ msg: 'User not found for this driver' });
+          }
+
+
+          const driverDetails = {
+            userPhoto: user.userPhoto,
+             fullname: user.fullname,
+             userId: user._id,
+        
+             userLocation: user.userLocation,
+             vehicleType: driver.vehicleType,
+             loadWeight: driver.loadWeight,
+             deliveryCarPhoto: driver.deliveryCarPhoto,
+             driverId: driver._id,
+             driverName: driver.driverName,
+             packageSize: driver.packageSize
+           
+           };
+     
+           
+           res.json(driverDetails);
+    
+
+
+
+
+        
+    } catch (error) {
+        
+    }
+
+
 
 }))
 
