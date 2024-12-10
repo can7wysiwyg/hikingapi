@@ -72,4 +72,22 @@ DeliverPublicRoute.get('/get_single_deliverer/:id', asyncHandler(async(req, res)
 }))
 
 
+DeliverPublicRoute.get('/by_parcel_size', asyncHandler(async(req, res) => {
+
+  try {
+    
+    const packageSizeEnums = await Delivery.schema.path('packageSize').options.enum
+
+    res.json({packageSizeEnums})
+
+
+    
+  } catch (error) {
+    res.json({msg: `there was an error: ${error.message}`})
+  }
+
+
+}))
+
+
 module.exports = DeliverPublicRoute
