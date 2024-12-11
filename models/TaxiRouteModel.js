@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 
 const RouteSchema = new mongoose.Schema({
-  driverId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Driver' },
+  taxiId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Driver' },
   routeName: { type: String, required: true },
   startLocation: { type: String, required: true },
   endLocation: { type: String, required: true },

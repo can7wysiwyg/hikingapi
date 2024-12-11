@@ -5,15 +5,15 @@ const verifyDriver = require('../middleware/verifyDriver')
 
 DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) => {
     try {
-      const { driverId, routeName, startLocation, endLocation, fare } = req.body;
+      const { taxiId, routeName, startLocation, endLocation, fare } = req.body;
   
       // Validate data
-      if (!driverId || !routeName || !startLocation || !endLocation || !fare) {
+      if (!taxiId || !routeName || !startLocation || !endLocation || !fare) {
         return res.status(400).json({ success: false, message: 'All fields are required' });
       }
   
       const route = new TaxiRoute({
-        driverId,
+        taxiId,
         routeName,
         startLocation,
         endLocation,
