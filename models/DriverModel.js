@@ -24,6 +24,12 @@ const DriverSchema = mongoose.Schema({
         enum: ['bus', 'taxi'],
         required: true, 
       },
+      taxiType: {
+        type: String,
+        enum: ['shared', 'non-shared'],
+        required: true,
+
+      }
   
 
 

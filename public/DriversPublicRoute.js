@@ -103,4 +103,21 @@ DriversPublicRoute.get('/taxi_single/:id', asyncHandler(async(req, res) => {
 
 }))  
 
+
+DriversPublicRoute.get('/taxi_type_enum', asyncHandler(async(req, res) => {
+
+try {
+
+  const taxiTypeEnums = await Driver.schema.path('taxiType').options.enum
+
+    res.json({taxiTypeEnums})
+
+  
+} catch (error) {
+  res.json({msg: `there was a problem while loading this info ${error.message}`})
+}
+
+
+}))
+
 module.exports = DriversPublicRoute

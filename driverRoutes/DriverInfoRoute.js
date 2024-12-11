@@ -25,7 +25,7 @@ DriverInfoRoute.post(
     return res.json({msg: "action not possible! you are already registered!"})
   }
 
-      const { driverCarPlate, driverCarCapacity, vehicleType } = req.body;
+      const { driverCarPlate, driverCarCapacity, vehicleType, taxiType } = req.body;
 
       if (!driverCarPlate)
         res.json({ msg: "car number plate cannot be empty" });
@@ -38,6 +38,11 @@ DriverInfoRoute.post(
         if (!vehicleType || !["bus", "taxi"].includes(vehicleType.toLowerCase())) {
           return res.json({ msg: "Invalid vehicle type. Must be 'bus' or 'taxi'." });
         }
+
+        if (!taxiType) {
+          return res.json({ msg: "cannot be empty" });
+        }
+  
   
         
 
@@ -50,6 +55,7 @@ DriverInfoRoute.post(
         driverCarPlate,
         driverName: req.user.id,
         vehicleType: vehicleType.toLowerCase(), 
+        taxiType
 
       });
 

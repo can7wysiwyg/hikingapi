@@ -8,7 +8,7 @@ const RideSchema = new mongoose.Schema({
   dropoffLocation: { type: String, required: true },
   fare: { type: Number, required: true },
   date: { type: Date, default: Date.now },
-  status: { type: String, enum: ['completed', 'canceled'], default: 'completed' },
+  status: { type: String, enum: ['request', 'completed', 'canceled'], default: 'request' },
 }, {
     timestamps: true
 });
