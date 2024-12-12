@@ -3,7 +3,7 @@ const TaxiRoute = require("../models/TaxiRouteModel");
 
 
 
-TaxiRoutePublic.get('/driver_see_my_routes/:id',  async(req, res) => {
+TaxiRoutePublic.get('/taxi_route/:id',  async(req, res) => {
 
 
     try {
