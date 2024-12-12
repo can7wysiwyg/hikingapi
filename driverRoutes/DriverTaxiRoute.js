@@ -32,7 +32,7 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
   DriverTaxiRoute.put('/driver/routes/:id', verify, verifyDriver, async (req, res) => {
     try {
       const route = await TaxiRoute.findOneAndUpdate(
-        { _id: req.params.id, driverId: req.body.driverId },
+        { _id: req.params.id, taxiId: req.body.taxiId },
         req.body,
         { new: true }
       );
@@ -52,7 +52,7 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
     try {
         const {id} = req.params
 
-        const myRoutes = await TaxiRoute.find({driverId: id})
+        const myRoutes = await TaxiRoute.find({taxiId: id})
 
         res.json(myRoutes)
         
