@@ -70,7 +70,8 @@ DriversPublicRoute.get(
           driverCarCapacity: driver.driverCarCapacity,
           driverCarPhoto: driver.driverCarPhoto,
           driverId: driver._id,
-          vehicleType: driver.vehicleType
+          vehicleType: driver.vehicleType,
+          taxiType: driver.taxiType
         
         };
   
