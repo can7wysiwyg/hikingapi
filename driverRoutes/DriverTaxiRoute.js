@@ -1,5 +1,6 @@
 const DriverTaxiRoute = require('express').Router()
 const TaxiRoute = require('../models/TaxiRouteModel')
+const Driver = require('../models/DriverModel')
 const verify = require('../middleware/verify')
 const verifyDriver = require('../middleware/verifyDriver')
 
@@ -29,21 +30,21 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
   
   
 
-  DriverTaxiRoute.put('/driver/routes/:id', verify, verifyDriver, async (req, res) => {
-    try {
-      const route = await TaxiRoute.findOneAndUpdate(
-        { _id: req.params.id, taxiId: req.body.taxiId },
-        req.body,
-        { new: true }
-      );
+  // DriverTaxiRoute.put('/driver/routes/:id', verify, verifyDriver, async (req, res) => {
+  //   try {
+  //     const route = await TaxiRoute.findOneAndUpdate(
+  //       { _id: req.params.id, taxiId: req.body.taxiId },
+  //       req.body,
+  //       { new: true }
+  //     );
   
-      if (!route) return res.status(404).json({ success: false, message: 'Route not found' });
+  //     if (!route) return res.status(404).json({ success: false, message: 'Route not found' });
   
-      res.status(200).json({ success: true, message: 'Route updated successfully', route });
-    } catch (error) {
-      res.status(500).json({ success: false, message: error.message });
-    }
-  });
+  //     res.status(200).json({ success: true, message: 'Route updated successfully', route });
+  //   } catch (error) {
+  //     res.status(500).json({ success: false, message: error.message });
+  //   }
+  // });
 
 
   DriverTaxiRoute.get('/driver_see_my_routes/:id', verify, verifyDriver, async(req, res) => {
@@ -52,7 +53,9 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
     try {
         const {id} = req.params
 
-        const myRoutes = await TaxiRoute.find({taxiId: id})
+        const driver = await Driver.findOne({driverName: id})
+
+        const myRoutes = await TaxiRoute.find({taxiId: driver._id})
 
         res.json(myRoutes)
         
