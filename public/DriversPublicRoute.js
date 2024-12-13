@@ -95,7 +95,41 @@ DriversPublicRoute.get('/taxi_single/:id', asyncHandler(async(req, res) => {
 
         const taxi = await Driver.findById(id)
 
-        res.json(taxi)
+      
+
+        const user = await User.findById(taxi.driverName)
+
+        
+
+
+        if (!user) {
+          return res.status(404).json({ msg: 'User not found for this driver' });
+        }
+  
+        
+        const driverDetails = {
+         userPhoto: user.userPhoto,
+          fullname: user.fullname,
+          phone: user.phone,
+          email: user.email,
+          userLocation: user.userLocation,
+          driverCarPlate: taxi.driverCarPlate,
+          driverCarCapacity: taxi.driverCarCapacity,
+          driverCarPhoto: taxi.driverCarPhoto,
+          driverId: taxi._id,
+          vehicleType: taxi.vehicleType,
+          taxiType: taxi.taxiType
+        
+        };
+  
+        // Respond with the combined driver details
+        res.json(driverDetails);
+
+
+
+
+
+        
         
     } catch (error) {
         res.json({msg: `there was an error: ${error.message}`})
