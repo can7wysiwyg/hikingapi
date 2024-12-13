@@ -116,6 +116,7 @@ DriversPublicRoute.get('/taxi_single/:id', asyncHandler(async(req, res) => {
           driverCarPlate: taxi.driverCarPlate,
           driverCarCapacity: taxi.driverCarCapacity,
           driverCarPhoto: taxi.driverCarPhoto,
+           driverName: taxi.driverName,
           driverId: taxi._id,
           vehicleType: taxi.vehicleType,
           taxiType: taxi.taxiType

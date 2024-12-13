@@ -26,28 +26,6 @@ TaxiRoutePublic.get('/taxi_route/:id',  async(req, res) => {
   })
 
 
-  TaxiRoutePublic.get('/book_taxi', verify, async(req, res) => {
-
-
-    try {
-
-        const {userId, driverId, pickupLocation, dropoffLocation} = req.body
-
-        if(!userId || !driverId || !pickupLocation || !dropoffLocation ) {
-            return res.json({msg: "fields cannot be empty"})
-        }
-
-        
-        
-    } catch (error) {
-
-        res.status(500).json({ success: false, message: error.message });
-        
-    }
-
-
-  })
-
 
 
   const generateConfirmationCode = () => {
