@@ -157,22 +157,26 @@ TaxiRoutePublic.get('/taxi_occupancy/:driverId', verify,  async (req, res) => {
 });
 
 
-
-TaxiRoutePublic.get('/taxi_occupancy_all', verify, async(req, res) => {
-
-try {
-
-    const sharedTaxis = await SharedTaxiBooking.find()
-
-    res.json({sharedTaxis})
-    
-} catch (error) {
-
-    res.status(500).json({ success: false, message: error.message });
-    
-}
-
-})
+TaxiRoutePublic.get('/taxi_occupancy_all',  async (req, res) => {
+    try {
+      const sharedTaxis = await SharedTaxiBooking.find().populate('driverId', 'name').populate('bookings.userId', 'name');
+  
+      
+      const sharedTaxisWithStatus = sharedTaxis.map((taxi) => ({
+        id: taxi._id,
+        driverId: taxi.driverId,
+        taxiCapacity: taxi.taxiCapacity,
+        currentOccupancy: taxi.bookings.length,
+        isFull: taxi.bookings.length >= taxi.taxiCapacity,
+        bookings: taxi.bookings,
+      }));
+  
+      res.json({ sharedTaxis: sharedTaxisWithStatus });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+  
   
 
 
