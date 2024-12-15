@@ -122,18 +122,32 @@ TaxiRoutePublic.post('/book_taxi', verify, async (req, res) => {
 
 
 
-TaxiRoutePublic.get('/taxi_occupancy/:driverId', verify,  async (req, res) => {
+
+TaxiRoutePublic.get('/taxi_occupancy/:driverId', verify, async (req, res) => {
     try {
         const { driverId } = req.params;  // Extract driverId from URL parameters
 
+        
         // Fetch the shared taxi booking entry using the driverId
         const sharedTaxi = await SharedTaxiBooking.findOne({ driverId });
         
         if (!sharedTaxi) {
-            return res.status(404).json({ msg: "Shared taxi not found" });
+            // If no shared taxi booking exists, return 200 with no bookings and the driver's capacity
+            const driver = await Driver.findById(driverId);
+            if (!driver) {
+                return res.status(404).json({ msg: "Driver not found" });
+            }
+            const maxCapacity = parseInt(driver.driverCarCapacity, 10);  // Get the driver's taxi capacity
+
+            return res.status(200).json({
+                success: true,
+                currentOccupancy: 0,  // No bookings yet
+                maxCapacity,          // Include driver's capacity
+                message: "Taxi is available, waiting for passengers."
+            });
         }
 
-        // Get the current number of bookings (length of confirmationCodes array)
+        // Get the current number of bookings (length of bookings array)
         const currentOccupancy = sharedTaxi.bookings.length;
 
         // Get the maximum capacity of the taxi (from the driver model)
@@ -142,19 +156,21 @@ TaxiRoutePublic.get('/taxi_occupancy/:driverId', verify,  async (req, res) => {
             return res.status(404).json({ msg: "Driver not found" });
         }
 
-        const maxCapacity = parseInt(driver.driverCarCapacity, 10);
+        const maxCapacity = parseInt(driver.driverCarCapacity, 10);  // Get the driver's taxi capacity
 
-        // Send the current occupancy and max capacity as response
+        // Send the current occupancy, max capacity, and driver's capacity as response
         res.status(200).json({
             success: true,
             currentOccupancy,
-            maxCapacity
+            maxCapacity,           // Send the maxCapacity as part of the response
         });
     } catch (error) {
         console.error('Error fetching taxi occupancy:', error);
         res.status(500).json({ success: false, message: error.message });
     }
 });
+
+
 
 
 TaxiRoutePublic.get('/taxi_occupancy_all',  async (req, res) => {
