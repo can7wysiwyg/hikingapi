@@ -157,6 +157,22 @@ TaxiRoutePublic.get('/taxi_occupancy/:driverId', verify,  async (req, res) => {
 });
 
 
+
+TaxiRoutePublic.get('/taxi_occupancy_all', verify, async(req, res) => {
+
+try {
+
+    const sharedTaxis = await SharedTaxiBooking.find()
+
+    res.json({sharedTaxis})
+    
+} catch (error) {
+
+    res.status(500).json({ success: false, message: error.message });
+    
+}
+
+})
   
 
 
