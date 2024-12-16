@@ -193,37 +193,76 @@ TaxiRoutePublic.get('/taxi_occupancy_all',  async (req, res) => {
     }
   });
   
-  TaxiRoutePublic.get('/check_if_user_booked/:driverId/:userId', async(req, res) => {
-
+  TaxiRoutePublic.get('/check_if_user_booked/:driverId/:userId', verify, async (req, res) => {
     try {
-
-        const {driverId, userId} = req.params
-
-        const sharedTaxi = await SharedTaxiBooking.findOne({ driverId });
-
-        if (!sharedTaxi) {
-          return res.status(404).json({ msg: "Shared taxi not found" });
-        }
-    
-        // Check if the user already has a booking
-        const userAlreadyBooked = sharedTaxi.bookings.some(booking => booking.userId.toString() === userId);
-
-        res.json({userAlreadyBooked})
-    
-
-        
-
-
-
-        
+      const { driverId, userId } = req.params;
+  
+      // Find the taxi by driverId
+      const sharedTaxi = await SharedTaxiBooking.findOne({ driverId });
+  
+      if (!sharedTaxi) {
+        // No bookings exist for this taxi yet
+        return res.status(200).json({
+          msg: "No bookings exist for this taxi yet.",
+          userAlreadyBooked: false
+        });
+      }
+  
+      // Check if the user already has a booking
+      const userAlreadyBooked = sharedTaxi.bookings.some(
+        (booking) => booking.userId.toString() === userId
+      );
+  
+      res.status(200).json({ userAlreadyBooked });
     } catch (error) {
-
-        res.status(500).json({ success: false, message: error.message });
-        
+      console.error("Error checking user booking:", error);
+      res.status(500).json({ success: false, message: error.message });
     }
+  });
 
 
-  })
-
+  TaxiRoutePublic.put('/cancel_shared_taxi_order/:driverId/:userId', verify, async (req, res) => {
+    try {
+      const { driverId, userId } = req.params;
+  
+      // Find the shared taxi by driverId
+      const sharedTaxi = await SharedTaxiBooking.findOne({ driverId });
+  
+      if (!sharedTaxi) {
+        return res.status(404).json({
+          msg: "Shared taxi not found.",
+          userAlreadyBooked: false,
+        });
+      }
+  
+      // Check if the user is in the bookings array
+      const userIndex = sharedTaxi.bookings.findIndex(
+        (booking) => booking.userId.toString() === userId
+      );
+  
+      if (userIndex === -1) {
+        return res.status(200).json({
+          msg: "User has not booked this taxi.",
+          userAlreadyBooked: false,
+        });
+      }
+  
+      // Remove the user from the bookings array
+      sharedTaxi.bookings.splice(userIndex, 1);
+  
+      // Save the updated shared taxi document
+      await sharedTaxi.save();
+  
+      res.status(200).json({
+        msg: "Booking canceled successfully.",
+        userAlreadyBooked: false,
+      });
+    } catch (error) {
+      console.error("Error canceling shared taxi order:", error.message);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+  
+  
 
   module.exports = TaxiRoutePublic
