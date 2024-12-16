@@ -193,7 +193,37 @@ TaxiRoutePublic.get('/taxi_occupancy_all',  async (req, res) => {
     }
   });
   
-  
+  TaxiRoutePublic.get('/check_if_user_booked/:driverId/:userId', async(req, res) => {
+
+    try {
+
+        const {driverId, userId} = req.params
+
+        const sharedTaxi = await SharedTaxiBooking.findOne({ driverId });
+
+        if (!sharedTaxi) {
+          return res.status(404).json({ msg: "Shared taxi not found" });
+        }
+    
+        // Check if the user already has a booking
+        const userAlreadyBooked = sharedTaxi.bookings.some(booking => booking.userId.toString() === userId);
+
+        res.json({userAlreadyBooked})
+    
+
+        
+
+
+
+        
+    } catch (error) {
+
+        res.status(500).json({ success: false, message: error.message });
+        
+    }
+
+
+  })
 
 
   module.exports = TaxiRoutePublic
