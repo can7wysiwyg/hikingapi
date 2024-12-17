@@ -121,6 +121,67 @@ TaxiRoutePublic.post('/book_taxi', verify, async (req, res) => {
 });
 
 
+TaxiRoutePublic.post('/book_non_shared_taxi', verify, async (req, res) => {
+  try {
+      const { userId, driverId, pickupLocation, dropoffLocation } = req.body;
+
+      // Validate required fields
+      if (!userId || !driverId || !pickupLocation || !dropoffLocation) {
+          return res.status(400).json({ msg: "Fields cannot be empty" });
+      }
+
+      // Fetch driver details
+      const driver = await Driver.findById(driverId);
+      if (!driver) {
+          return res.status(404).json({ msg: "Driver not found" });
+      }
+
+      // Ensure the taxi is non-shared
+      if (driver.taxiType !== 'non-shared') {
+          return res.status(400).json({ msg: "This driver is not assigned to a non-shared taxi" });
+      }
+
+      // Create a new ride for the non-shared taxi
+      const newRide = new Ride({
+          userId,
+          driverId,
+          pickupLocation,
+          dropoffLocation,
+        
+      });
+
+      // Save the ride details
+      const savedRide = await newRide.save();
+
+      // Generate a confirmation code for the ride
+      const confirmationCode = generateConfirmationCode();
+
+      // Save confirmation code details
+      const newConfirmation = new ConfirmationCode({
+          confirmationCode,
+          rideStatus: 'requested',
+          taxiName: savedRide._id,
+      });
+
+      await newConfirmation.save();
+
+      // Return success response
+      return res.status(201).json({
+          success: true,
+          message: 'Non-shared taxi booked successfully!',
+          rideDetails: savedRide,
+          confirmationDetails: {
+              confirmationCode,
+              rideStatus: 'requested',
+          },
+      });
+  } catch (error) {
+      console.error('Error booking non-shared taxi:', error);
+      res.status(500).json({ success: false, message: 'An error occurred while booking the taxi' });
+  }
+});
+
+
 
 
 TaxiRoutePublic.get('/taxi_occupancy/:driverId', verify, async (req, res) => {
@@ -262,6 +323,19 @@ TaxiRoutePublic.get('/taxi_occupancy_all',  async (req, res) => {
       res.status(500).json({ success: false, message: error.message });
     }
   });
+
+
+  TaxiRoutePublic.post('/order_non_shared_taxi', verify, async(req, res) => {
+
+    try {
+      
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+      
+    }
+
+
+  })
   
   
 

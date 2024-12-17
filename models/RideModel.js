@@ -5,7 +5,7 @@ const RideSchema = new mongoose.Schema({
   driverId: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', required: true },
   pickupLocation: { type: String, required: true },
   dropoffLocation: { type: String, required: true },
-  fare: { type: Number, required: true },
+  // fare: { type: Number, required: true },
   date: { type: Date, default: Date.now },
 
 }, {
