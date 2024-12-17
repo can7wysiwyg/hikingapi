@@ -336,6 +336,41 @@ TaxiRoutePublic.get('/taxi_occupancy_all',  async (req, res) => {
 
 
   })
+
+
+  // TaxiRoutePublic.get('/check_non_shared_if_booked/:driverId/:userId', verify, async(req, res) => {
+
+  //   try {
+  //     const {driverId, userId} = req.body
+
+  //     Ride
+
+      
+  //   } catch (error) {
+
+  //     res.status(500).json({ success: false, message: error.message });
+      
+      
+  //   }
+  // })
+
+
+  TaxiRoutePublic.get('/all_booked_non_shared_taxis',  async(req, res) => {
+
+try {
+
+  const allRides = await Ride.find()
+
+  res.json({allRides})
+  
+} catch (error) {
+
+  res.status(500).json({ success: false, message: error.message });
+      
+  
+}
+
+  })
   
   
 
