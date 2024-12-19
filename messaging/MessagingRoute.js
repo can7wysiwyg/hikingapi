@@ -199,9 +199,7 @@ MessagingRoute.post('/mark_messages_as_read', verify, async (req, res) => {
       }
     );
 
-    // Log the update result for debugging
-    console.log('Update Result:', result);
-
+    
     // Retrieve the updated conversation for inspection
     const updatedConversation = await Conversation.findById(conversationId);
 
@@ -215,7 +213,7 @@ MessagingRoute.post('/mark_messages_as_read', verify, async (req, res) => {
         res.json({ message: 'Messages marked as read' });
       } else {
         // In case there are still unread messages
-        console.error('Some messages are still unread.');
+        
         res.json({ message: 'Failed to mark all messages as read' });
       }
     } else {
@@ -225,8 +223,7 @@ MessagingRoute.post('/mark_messages_as_read', verify, async (req, res) => {
     
       } catch (error) {
 
-        console.error(error)
-  
+        
     res.status(500).json({ message: 'Error marking messages as read' });
   }
 });
