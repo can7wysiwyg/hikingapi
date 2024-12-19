@@ -6,13 +6,16 @@ const Conversation = require('../models/MessageModel')
 
 
 
-
 MessagingRoute.post('/start_conversation', verify, asyncHandler(async(req, res) => {
 
 
     try {
 
+      
+
         const { senderId, recipientId } = req.body;
+
+        
 
         if (!senderId || !recipientId) {
           return res.status(400).json({ msg: 'Sender and recipient are required.' });
@@ -81,7 +84,7 @@ MessagingRoute.post('/start_conversation', verify, asyncHandler(async(req, res) 
 // }))
 
 
-MessagingRoute.post('/send_message', asyncHandler(async (req, res) => {
+MessagingRoute.post('/send_message', verify, asyncHandler(async (req, res) => {
   try {
       const { conversationId, senderId, content, receiverId } = req.body;
 
@@ -161,7 +164,35 @@ MessagingRoute.get('/conversations/:id', verify,  asyncHandler(async (req, res) 
 }));
 
 
+MessagingRoute.get('/unread_messages', verify, async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const unreadCount = await Conversation.aggregate([
+      { $match: { 'participants': userId } },
+      { $unwind: '$messages' },
+      { $match: { 'messages.isRead': false, 'messages.receiver': userId } },
+      { $count: 'unreadMessages' }
+    ]);
 
+    res.json({ unreadCount: unreadCount.length ? unreadCount[0].unreadMessages : 0 });
+  } catch (error) {
+    res.status(500).json({ message: 'Error retrieving unread messages' });
+  }
+});
+
+
+MessagingRoute.post('/mark_messages_as_read', verify, async (req, res) => {
+  try {
+    const { conversationId, userId } = req.body;
+    await Conversation.updateOne(
+      { _id: conversationId, 'messages.receiver': userId, 'messages.isRead': false },
+      { $set: { 'messages.$.isRead': true } }
+    );
+    res.json({ message: 'Messages marked as read' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error marking messages as read' });
+  }
+});
 
 
 module.exports = MessagingRoute
