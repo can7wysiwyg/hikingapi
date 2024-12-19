@@ -133,7 +133,7 @@ function getVals(senderId, receiverId) {
 
 
 
-MessagingRoute.get('/get_my_messages/:id', verify, asyncHandler(async(req, res) => {
+MessagingRoute.get('/get_my_messages/:id',  asyncHandler(async(req, res) => {
 
 
   try {
@@ -184,15 +184,30 @@ MessagingRoute.get('/unread_messages', verify, async (req, res) => {
 MessagingRoute.post('/mark_messages_as_read', verify, async (req, res) => {
   try {
     const { conversationId, userId } = req.body;
-    await Conversation.updateOne(
-      { _id: conversationId, 'messages.receiver': userId, 'messages.isRead': false },
-      { $set: { 'messages.$.isRead': true } }
+
+    // Update all messages where the receiver is the user and is marked as unread
+    const result = await Conversation.updateMany(
+      { 
+        _id: conversationId,
+        'messages.receiver': userId, 
+        'messages.isRead': false 
+      },
+      { 
+        $set: { 'messages.$.isRead': true } 
+      }
     );
-    res.json({ message: 'Messages marked as read' });
+
+    if (result.nModified > 0) {
+      res.json({ message: 'Messages marked as read' });
+    } else {
+      res.json({ message: 'No unread messages found' });
+    }
+    
   } catch (error) {
     res.status(500).json({ message: 'Error marking messages as read' });
   }
 });
+
 
 
 module.exports = MessagingRoute
