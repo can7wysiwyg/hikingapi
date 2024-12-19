@@ -189,7 +189,7 @@ MessagingRoute.post('/mark_messages_as_read', verify, async (req, res) => {
     const result = await Conversation.updateMany(
       { 
         _id: conversationId,
-        'messages.receiver': userId, 
+        'messages.sender': userId, 
         'messages.isRead': false 
       },
       { 
