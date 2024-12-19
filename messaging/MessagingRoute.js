@@ -185,29 +185,51 @@ MessagingRoute.post('/mark_messages_as_read', verify, async (req, res) => {
   try {
     const { conversationId, userId } = req.body;
 
-    // Update all messages where the receiver is the user and is marked as unread
-    const result = await Conversation.updateMany(
-      { 
+    result = await Conversation.updateMany(
+      {
         _id: conversationId,
-        'messages.sender': userId, 
-        'messages.isRead': false 
+        'messages.receiver': userId,
+        'messages.isRead': false,
       },
-      { 
-        $set: { 'messages.$.isRead': true } 
+      {
+        $set: { 'messages.$[elem].isRead': true },
+      },
+      {
+        arrayFilters: [{ 'elem.receiver': userId, 'elem.isRead': false }],
       }
     );
 
+    // Log the update result for debugging
+    console.log('Update Result:', result);
+
+    // Retrieve the updated conversation for inspection
+    const updatedConversation = await Conversation.findById(conversationId);
+
     if (result.nModified > 0) {
-      res.json({ message: 'Messages marked as read' });
+      // Check if any messages are marked as read
+      const unreadMessages = updatedConversation.messages.filter(
+        (message) => message.receiver.toString() === userId && !message.isRead
+      );
+
+      if (unreadMessages.length === 0) {
+        res.json({ message: 'Messages marked as read' });
+      } else {
+        // In case there are still unread messages
+        console.error('Some messages are still unread.');
+        res.json({ message: 'Failed to mark all messages as read' });
+      }
     } else {
       res.json({ message: 'No unread messages found' });
     }
+
     
-  } catch (error) {
+      } catch (error) {
+
+        console.error(error)
+  
     res.status(500).json({ message: 'Error marking messages as read' });
   }
 });
-
 
 
 module.exports = MessagingRoute
