@@ -121,65 +121,119 @@ TaxiRoutePublic.post('/book_taxi', verify, async (req, res) => {
 });
 
 
+// TaxiRoutePublic.post('/book_non_shared_taxi', verify, async (req, res) => {
+//   try {
+//       const { userId, driverId, pickupLocation, dropoffLocation } = req.body;
+
+//       // Validate required fields
+//       if (!userId || !driverId || !pickupLocation || !dropoffLocation) {
+//           return res.status(400).json({ msg: "Fields cannot be empty" });
+//       }
+
+//       // Fetch driver details
+//       const driver = await Driver.findById(driverId);
+//       if (!driver) {
+//           return res.status(404).json({ msg: "Driver not found" });
+//       }
+
+//       // Ensure the taxi is non-shared
+//       if (driver.taxiType !== 'non-shared') {
+//           return res.status(400).json({ msg: "This driver is not assigned to a non-shared taxi" });
+//       }
+
+//       // Create a new ride for the non-shared taxi
+//       const newRide = new Ride({
+//           userId,
+//           driverId,
+//           pickupLocation,
+//           dropoffLocation,
+        
+//       });
+
+//       // Save the ride details
+//       const savedRide = await newRide.save();
+
+//       // Generate a confirmation code for the ride
+//       const confirmationCode = generateConfirmationCode();
+
+//       // Save confirmation code details
+//       const newConfirmation = new ConfirmationCode({
+//           confirmationCode,
+//           rideStatus: 'requested',
+//           taxiName: savedRide._id,
+//       });
+
+//       await newConfirmation.save();
+
+//       // Return success response
+//       return res.status(201).json({
+//           success: true,
+//           message: 'Non-shared taxi booked successfully!',
+//           rideDetails: savedRide,
+//           confirmationDetails: {
+//               confirmationCode,
+//               rideStatus: 'requested',
+//           },
+//       });
+//   } catch (error) {
+//       console.error('Error booking non-shared taxi:', error);
+//       res.status(500).json({ success: false, message: 'An error occurred while booking the taxi' });
+//   }
+// });
+
+
+
 TaxiRoutePublic.post('/book_non_shared_taxi', verify, async (req, res) => {
   try {
-      const { userId, driverId, pickupLocation, dropoffLocation } = req.body;
+    const { userId, driverId, pickupLocation, dropoffLocation } = req.body;
 
-      // Validate required fields
-      if (!userId || !driverId || !pickupLocation || !dropoffLocation) {
-          return res.status(400).json({ msg: "Fields cannot be empty" });
-      }
+    // Validate required fields
+    if (!userId || !driverId || !pickupLocation || !dropoffLocation) {
+      return res.status(400).json({ msg: 'Fields cannot be empty' });
+    }
 
-      // Fetch driver details
-      const driver = await Driver.findById(driverId);
-      if (!driver) {
-          return res.status(404).json({ msg: "Driver not found" });
-      }
+    // Fetch driver details
+    const driver = await Driver.findById(driverId);
+    if (!driver) {
+      return res.status(404).json({ msg: 'Driver not found' });
+    }
 
-      // Ensure the taxi is non-shared
-      if (driver.taxiType !== 'non-shared') {
-          return res.status(400).json({ msg: "This driver is not assigned to a non-shared taxi" });
-      }
+    // Ensure the taxi is non-shared
+    if (driver.taxiType !== 'non-shared') {
+      return res.status(400).json({ msg: 'This driver is not assigned to a non-shared taxi' });
+    }
 
-      // Create a new ride for the non-shared taxi
-      const newRide = new Ride({
-          userId,
-          driverId,
-          pickupLocation,
-          dropoffLocation,
-        
-      });
+    // Generate a unique confirmation code
+    const confirmationCode = generateConfirmationCode();
 
-      // Save the ride details
-      const savedRide = await newRide.save();
+    // Create and save the new ride
+    const newRide = new Ride({
+      userId,
+      driverId,
+      pickupLocation,
+      dropoffLocation,
+      confirmationCode,
+      rideStatus: 'requested', // Initial ride status
+    });
 
-      // Generate a confirmation code for the ride
-      const confirmationCode = generateConfirmationCode();
+    const savedRide = await newRide.save();
 
-      // Save confirmation code details
-      const newConfirmation = new ConfirmationCode({
-          confirmationCode,
-          rideStatus: 'requested',
-          taxiName: savedRide._id,
-      });
-
-      await newConfirmation.save();
-
-      // Return success response
-      return res.status(201).json({
-          success: true,
-          message: 'Non-shared taxi booked successfully!',
-          rideDetails: savedRide,
-          confirmationDetails: {
-              confirmationCode,
-              rideStatus: 'requested',
-          },
-      });
+    // Return success response
+    return res.status(201).json({
+      success: true,
+      message: 'Non-shared taxi booked successfully!',
+      rideDetails: {
+        ...savedRide._doc,
+        confirmationCode,
+        rideStatus: 'requested',
+      },
+    });
   } catch (error) {
-      console.error('Error booking non-shared taxi:', error);
-      res.status(500).json({ success: false, message: 'An error occurred while booking the taxi' });
+    console.error('Error booking non-shared taxi:', error);
+    res.status(500).json({ success: false, message: 'An error occurred while booking the taxi' });
   }
 });
+
 
 
 
@@ -371,6 +425,64 @@ try {
 }
 
   })
+
+
+  TaxiRoutePublic.get('/ride_requested/:id', verify, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // Look for requested rides
+        const requestedRides = await Ride.find({
+            userId: id,
+            status: 'requested',
+        });
+
+        // If there are requested rides, return them
+        if (requestedRides.length > 0) {
+            return res.status(200).json(requestedRides);
+        }
+
+        // If no requested rides, check for any rides
+        const allRides = await Ride.find({
+            userId: id,
+        });
+
+        if (allRides.length > 0) {
+            return res.status(200).json(allRides);  // Return other rides
+        }
+
+        // If no rides exist at all, return a friendly message and empty array
+        res.status(200).json({
+            message: 'No rides found for the user.',
+            rides: [],
+        });
+    } catch (error) {
+        console.error('Error fetching rides:', error);
+        res.status(500).json({ message: 'An unexpected error occurred while fetching rides.' });
+    }
+});
+
+
+
+TaxiRoutePublic.delete('/cancel_requested_ride/:id', verify, async(req, res) => {
+
+
+  try {
+
+    const {id} = req.params
+
+    await Ride.findByIdAndDelete(id)
+
+    res.json({msg: "Taxi has been cancelled!"})
+
+
+
+    
+  } catch (error) {
+    res.status(500).json({ msg: `An unexpected error occurred while  deleting route: ${error}` });
+  }
+
+})
   
   
 
