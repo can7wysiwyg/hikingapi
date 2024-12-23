@@ -29,7 +29,25 @@ const DriverSchema = mongoose.Schema({
         enum: ['shared', 'non-shared'],
         required: true,
 
-      }
+      },
+
+      idPhotoFront: {
+        type: String,
+        required: true
+    },
+
+    idPhotoBack: {
+        type: String,
+        required: true
+    },
+
+    drivingLicence: {
+        type: String,
+        required: true
+
+
+    },
+
   
 
 

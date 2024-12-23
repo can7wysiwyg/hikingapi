@@ -3,7 +3,7 @@ const User = require("../models/UserModel");
 const Driver = require("../models/DriverModel");
 const asyncHandler = require("express-async-handler");
 const verify = require("../middleware/verify");
-const verifyDriver = require("../middleware/verifyDriver");
+const verifyDriver = require('../middleware/verifyDriver')
 const cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
@@ -12,71 +12,87 @@ cloudinary.config({
   api_secret: process.env.API_SECRET,
 });
 
+
 DriverInfoRoute.post(
   "/driver_info_create",
   verify,
   verifyDriver,
   asyncHandler(async (req, res) => {
     try {
+      // Check if driver already exists
+      const alreadyExists = await Driver.findOne({ driverName: req.user.id });
 
-  const alreadyExists = await Driver.findOne({driverName: req.user.id})
-
-  if(alreadyExists) {
-    return res.json({msg: "action not possible! you are already registered!"})
-  }
-
-      const { driverCarPlate, driverCarCapacity, vehicleType, taxiType } = req.body;
-
-      if (!driverCarPlate)
-        res.json({ msg: "car number plate cannot be empty" });
-
-      if (!driverCarCapacity)
-        res.json({
-          msg: "you should specify the number of people your car carries",
-        });
-
-        if (!vehicleType || !["bus", "taxi"].includes(vehicleType.toLowerCase())) {
-          return res.json({ msg: "Invalid vehicle type. Must be 'bus' or 'taxi'." });
-        }
-
-        if (!taxiType) {
-          return res.json({ msg: "cannot be empty" });
-        }
-  
-  
-        
-
-      if (!req.files || !req.files.driverCarPhoto) {
-        return res.json({ msg: "your car Photo is required." });
+      if (alreadyExists) {
+        return res.json({ msg: "Action not possible! You are already registered!" });
       }
 
+      // Destructure fields from the request body
+      const { driverCarPlate, driverCarCapacity, vehicleType, taxiType } = req.body;
+
+      // Validate required fields
+      if (!driverCarPlate) {
+        return res.json({ msg: "Car number plate cannot be empty" });
+      }
+
+      if (!driverCarCapacity) {
+        return res.json({
+          msg: "You should specify the number of people your car carries",
+        });
+      }
+
+      if (!vehicleType || !["bus", "taxi"].includes(vehicleType.toLowerCase())) {
+        return res.json({ msg: "Invalid vehicle type. Must be 'bus' or 'taxi'." });
+      }
+
+      if (!taxiType) {
+        return res.json({ msg: "Taxi type cannot be empty" });
+      }
+
+      // Validate photo fields
+      if (
+        !req.files ||
+        !req.files.driverCarPhoto ||
+        !req.files.drivingLicence ||
+        !req.files.idPhotoFront ||
+        !req.files.idPhotoBack
+      ) {
+        return res.json({ msg: "All photos (Car Photo, Driving Licence, ID Front, ID Back) are required." });
+      }
+
+      // Create a new driver object
       const driver = new Driver({
         driverCarCapacity,
         driverCarPlate,
         driverName: req.user.id,
-        vehicleType: vehicleType.toLowerCase(), 
-        taxiType
-
+        vehicleType: vehicleType.toLowerCase(),
+        taxiType,
       });
 
-      const driverCarPhoto = req.files.driverCarPhoto;
-    
-      const result = await cloudinary.uploader.upload(
-        driverCarPhoto.tempFilePath
-      );
+      // Upload all photos to Cloudinary
+      const uploadToCloudinary = async (file) => {
+        const result = await cloudinary.uploader.upload(file.tempFilePath);
+        return result.secure_url;
+      };
 
-      driver.driverCarPhoto = result.secure_url;
+      driver.driverCarPhoto = await uploadToCloudinary(req.files.driverCarPhoto);
+      driver.drivingLicence = await uploadToCloudinary(req.files.drivingLicence);
+      driver.idPhotoFront = await uploadToCloudinary(req.files.idPhotoFront);
+      driver.idPhotoBack = await uploadToCloudinary(req.files.idPhotoBack);
 
+      // Save the driver object
       await driver.save();
 
-      res.json({ msg: "You have successfully updated your info as a driver!" });
+      res.json({ msg: "We Will Get Back To You..." });
     } catch (error) {
       res.json({
-        msg: `there was a problem in updating the car photo: ${error.message}`,
+        msg: `There was a problem updating driver information: ${error.message}`,
       });
     }
   })
 );
+
+
+
 
 DriverInfoRoute.put(
   "/driver_car_photo_update/:id",
