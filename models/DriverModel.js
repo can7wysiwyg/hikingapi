@@ -49,7 +49,7 @@ const DriverSchema = mongoose.Schema({
     },
 
     approvedItem: {
-        type: boolean,
+        type: Boolean,
         default: false
         
     }
