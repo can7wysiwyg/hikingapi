@@ -48,6 +48,12 @@ const DriverSchema = mongoose.Schema({
 
     },
 
+    approvedItem: {
+        type: boolean,
+        default: false
+        
+    }
+
   
 
 
