@@ -10,7 +10,7 @@ DriversPublicRoute.get('/taxis_show_all', asyncHandler(async(req, res) => {
     try {
 
     
-        const  taxis = await Driver.find();  
+        const  taxis = await Driver.find({ approvedItem: true });  
       
       res.json({ taxis });
 
