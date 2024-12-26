@@ -73,7 +73,7 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
 
   // de-boarding passenger(s)
 
-  DriverTaxiRoute.get('/show_boarded_taxi_to_owner/:id', verify, verifyDriver, async (req, res) => {
+  DriverTaxiRoute.get('/show_boarded_taxi_to_owner/:id', verify, verifyDriver,  async (req, res) => {
     try {
       const { id } = req.params;
   
@@ -82,25 +82,29 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
       if (!driverExists) {
         return res.status(404).json({ msg: "Driver does not exist" });
       }
-  
+
       const driverId = driverExists._id;
-  
-      // Check for non-shared taxi (Ride model)
-      const nonSharedTaxi = await Ride.findOne({ driverId });
-      if (nonSharedTaxi) {
-        // Return the non-shared taxi details
-        return res.status(200).json({passengers: nonSharedTaxi });
+
+      if(driverExists.taxiType === "non-shared") {
+        const nonSharedTaxi = await Ride.findOne({ driverId });
+        res.status(200).json({passengers: nonSharedTaxi });
+
+        
+
+      } else if( driverExists.taxiType === "shared"){
+        const sharedTaxi = await SharedTaxiBooking.findOne({ driverId });
+        
+        res.status(200).json({passengers: sharedTaxi });
+        
+
+      } else{
+        res.status(404).json({ msg: "No passengers boarded this taxi" });
+
       }
+
   
-      // Check for shared taxi (SharedTaxiBooking model)
-      const sharedTaxi = await SharedTaxiBooking.findOne({ driverId });
-      if (sharedTaxi) {
-        // Return the shared taxi details
-        return res.status(200).json({passengers: sharedTaxi.passengers });
-      }
-  
-      // If neither non-shared nor shared taxi is found
-      return res.status(404).json({ msg: "No passengers boarded this taxi" });
+     
+        
   
     } catch (error) {
       console.error("Error fetching taxi details:", error);
@@ -144,8 +148,33 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
     }
   });
   
+  DriverTaxiRoute.delete('/de_board_from_shared_taxi/:userId/:driverId', verify, verifyDriver, async (req, res) => {
+    try {
+      const { userId, driverId } = req.params;
   
-
+      // Find the SharedTaxiBooking document and update it
+      const updatedTaxiBooking = await SharedTaxiBooking.findOneAndUpdate(
+        { driverId }, // Match the taxi by driverId
+        { $pull: { bookings: { userId } } }, // Remove the booking with the specified userId
+        { new: true } // Return the updated document
+      );
+  
+      // Check if the document was found and updated
+      if (!updatedTaxiBooking) {
+        return res.status(404).json({ msg: 'No shared taxi booking found for the provided driverId.' });
+      }
+  
+      res.status(200).json({
+        msg: `Passenger  was successfully deboarded.`,
+        updatedTaxiBooking,
+      });
+    } catch (error) {
+      res.status(500).json({ msg: `There was an error: ${error.message}` });
+    }
+  });
+  
+  
+ 
   module.exports = DriverTaxiRoute
   
   
