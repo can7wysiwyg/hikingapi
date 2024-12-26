@@ -93,6 +93,31 @@ DriverInfoRoute.post(
 
 
 
+DriverInfoRoute.get("/check_if_info_exists/:id", verify, asyncHandler(async(req, res) => {
+
+try {
+
+  const {id} = req.params
+
+
+  const userExists = await Driver.findOne({ driverName: id });
+
+res.json({ userExists: !!userExists });
+
+
+  
+  
+} catch (error) {
+  res.json({
+    msg: `There was a problem updating driver information: ${error.message}`,
+  })
+  
+}
+
+
+}))
+
+
 
 DriverInfoRoute.put(
   "/driver_car_photo_update/:id",
