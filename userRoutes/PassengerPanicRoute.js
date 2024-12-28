@@ -61,7 +61,7 @@ PassengerPanicRoute.post("/passenger_send_alert/:passengerId", verify, async (re
   
       const mailOptions = {
         from: process.env.EMAIL_USER,
-        to: process.env.SUPPORT_EMAIL,
+        to: process.env.EMAIL_USER,
         subject: "Passenger Panic Alert",
         text: `
           A panic alert has been triggered by the passenger:
