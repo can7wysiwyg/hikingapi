@@ -21,6 +21,7 @@ const TaxiRoutePublic = require('./public/TaxiRoutePublic')
 const AdminCourierRoute = require('./adminRoutes/AdminCourierRoute')
 const CouriersPublic = require('./public/CouriersPublic')
 const DriverPanicRoute = require('./driverRoutes/DriverPanicRoute')
+const PassengerPanicRoute = require('./userRoutes/PassengerPanicRoute')
 
 
 
@@ -58,6 +59,7 @@ app.use(TaxiRoutePublic)
 app.use(AdminCourierRoute)
 app.use(CouriersPublic)
 app.use(DriverPanicRoute)
+app.use(PassengerPanicRoute)
 
 app.get('/api/reverse-geocode', async (req, res) => {
   const { latitude, longitude } = req.query;

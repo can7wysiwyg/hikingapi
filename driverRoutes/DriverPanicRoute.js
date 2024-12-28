@@ -75,7 +75,7 @@ DriverPanicRoute.post('/driver_send_alert/:driverId', verify, verifyDriver, asyn
   
       const mailOptions = {
         from: process.env.EMAIL_USER,
-        to: item.email,
+        to: process.env.EMAIL_USER,
         subject: "Driver Panic Alert",
         text: `
           A panic alert has been triggered by the driver:
