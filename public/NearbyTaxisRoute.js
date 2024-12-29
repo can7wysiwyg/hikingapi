@@ -40,7 +40,7 @@ const harvesine = require('haversine-distance')
 
 
 NearbyTaxisRoute.get("/getNearbyTaxis", async (req, res) => {
-    const { latitude, longitude } = req.body;
+    const { latitude, longitude } = req.query;
   
     console.log("Received passenger location:", { latitude, longitude });
   
@@ -62,9 +62,10 @@ NearbyTaxisRoute.get("/getNearbyTaxis", async (req, res) => {
   
             try {
               const distance = harvesine(passengerLocation, driverLocation); // Distance in meters
+              console.log(distance)
               return {
                 driverId: driver._id,
-                name: driver.name,
+                name: driver.driverName,
                 distance: (distance / 1000).toFixed(2), // Convert to kilometers
               };
             } catch (distanceError) {

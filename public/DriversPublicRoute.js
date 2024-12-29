@@ -2,25 +2,56 @@ const DriversPublicRoute = require('express').Router()
 const User = require('../models/UserModel')
 const Driver = require('../models/DriverModel')
 const asyncHandler = require('express-async-handler')
+const harvesine = require('haversine-distance')
 
 
-DriversPublicRoute.get('/taxis_show_all', asyncHandler(async(req, res) => {
-  
+DriversPublicRoute.get('/taxis_show_all', asyncHandler(async (req, res) => {
+  const { latitude, longitude } = req.query; // Extract query params
 
-    try {
+  try {
+    // Fetch all approved drivers
+    const drivers = await Driver.find({ approvedItem: true });
 
-    
-        const  taxis = await Driver.find({ approvedItem: true });  
-      
-      res.json({ taxis });
-
-        
-        
-    } catch (error) {
-        res.json({msg: `there was an error while fetching users: ${error.message}`})
+    // If no latitude and longitude provided, just return all taxis
+    if (!latitude || !longitude) {
+      return res.json({ taxis: drivers });
     }
 
-}))
+    // If latitude and longitude are provided, calculate distances for nearby drivers
+    const passengerLocation = { latitude: parseFloat(latitude), longitude: parseFloat(longitude) };
+
+    // Calculate distances and return full driver objects
+    let nearbyDrivers = drivers
+      .map((driver) => {
+        if (driver.location && driver.location.latitude && driver.location.longitude) {
+          const driverLocation = {
+            latitude: driver.location.latitude,
+            longitude: driver.location.longitude,
+          };
+          try {
+            const distance = harvesine(passengerLocation, driverLocation); // Distance in meters
+            return {
+              ...driver.toObject(), // Spread the entire driver object
+              distance: (distance / 1000).toFixed(2), // Add distance in kilometers
+            };
+          } catch (distanceError) {
+            console.error("Error calculating distance for driver:", driver._id, distanceError);
+            return null;
+          }
+        }
+        return null; // Skip drivers with invalid location
+      })
+      .filter((driver) => driver); // Filter out null entries
+
+    // Sort by distance (nearest first)
+    nearbyDrivers.sort((a, b) => a.distance - b.distance);
+
+    res.status(200).json({ nearbyDrivers });
+  } catch (error) {
+    res.json({ msg: `There was an error while fetching drivers: ${error.message}` });
+  }
+}));
+
 
 
 DriversPublicRoute.get('/drivers_show_all', asyncHandler(async(req, res) => {
