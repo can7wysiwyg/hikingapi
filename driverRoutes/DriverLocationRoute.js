@@ -9,7 +9,7 @@ DriverLocationRoute.post("/updateLocation/:driverId", verify, verifyDriver, asyn
     const { latitude, longitude } = req.body;
   
     try {
-      const driver = await Driver.findOne({_id: driverId});
+      const driver = await Driver.findOne({driverName: driverId});
       if (!driver) return res.status(404).json({ msg: "Driver not found" });
   
       // Update driver's location
