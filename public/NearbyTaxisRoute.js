@@ -39,7 +39,7 @@ const harvesine = require('haversine-distance')
 
 
 
-NearbyTaxisRoute.post("/getNearbyTaxis", async (req, res) => {
+NearbyTaxisRoute.get("/getNearbyTaxis", async (req, res) => {
     const { latitude, longitude } = req.body;
   
     console.log("Received passenger location:", { latitude, longitude });
