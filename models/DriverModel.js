@@ -15,6 +15,13 @@ const DriverSchema = mongoose.Schema({
         required: true
 
     },
+    location: {
+        latitude: { type: Number, default: null },
+        longitude: { type: Number, default: null },
+      },
+      lastUpdated: { type: Date },
+
+    
     driverCarPhoto: {
         type: String,
         required: true
