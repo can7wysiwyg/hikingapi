@@ -5,71 +5,23 @@ const asyncHandler = require('express-async-handler')
 const harvesine = require('haversine-distance')
 
 
-// DriversPublicRoute.get('/taxis_show_all', asyncHandler(async (req, res) => {
-//   const { latitude, longitude } = req.query; // Extract query params
-
-//   try {
-//     // Fetch all approved drivers
-//     const drivers = await Driver.find({ approvedItem: true });
-
-//     // If no latitude and longitude provided, just return all taxis
-//     if (!latitude || !longitude) {
-//       return res.json({ taxis: drivers });
-//     }
-
-//     // If latitude and longitude are provided, calculate distances for nearby drivers
-//     const passengerLocation = { latitude: parseFloat(latitude), longitude: parseFloat(longitude) };
-
-//     // Calculate distances and return full driver objects
-//     let nearbyDrivers = drivers
-//       .map((driver) => {
-//         if (driver.location && driver.location.latitude && driver.location.longitude) {
-//           const driverLocation = {
-//             latitude: driver.location.latitude,
-//             longitude: driver.location.longitude,
-//           };
-//           try {
-//             const distance = harvesine(passengerLocation, driverLocation); // Distance in meters
-//             return {
-//               ...driver.toObject(), // Spread the entire driver object
-//               distance: (distance / 1000).toFixed(2), // Add distance in kilometers
-//             };
-//           } catch (distanceError) {
-//             console.error("Error calculating distance for driver:", driver._id, distanceError);
-//             return null;
-//           }
-//         }
-//         return null; // Skip drivers with invalid location
-//       })
-//       .filter((driver) => driver); // Filter out null entries
-
-//     // Sort by distance (nearest first)
-//     nearbyDrivers.sort((a, b) => a.distance - b.distance);
-
-//     res.status(200).json({ nearbyDrivers });
-//   } catch (error) {
-//     res.json({ msg: `There was an error while fetching drivers: ${error.message}` });
-//   }
-// }));
-
 
 DriversPublicRoute.get('/taxis_show_all', asyncHandler(async (req, res) => {
-  const { latitude, longitude } = req.query; // Extract query params
-  const MAX_DISTANCE_KM = 10811.04; // Set the maximum distance limit in kilometers (change as needed)
+  const { latitude, longitude } = req.query;
+  const MAX_DISTANCE_KM = 16747; // Maximum distance in kilometers
 
   try {
-    // Fetch all approved drivers
     const drivers = await Driver.find({ approvedItem: true });
 
-    // If no latitude and longitude provided, just return all taxis
     if (!latitude || !longitude) {
       return res.json({ taxis: drivers });
     }
 
-    // If latitude and longitude are provided, calculate distances for nearby drivers
-    const passengerLocation = { latitude: parseFloat(latitude), longitude: parseFloat(longitude) };
+    const passengerLocation = {
+      latitude: parseFloat(latitude),
+      longitude: parseFloat(longitude),
+    };
 
-    // Calculate distances and return full driver objects
     let nearbyDrivers = drivers
       .map((driver) => {
         if (driver.location && driver.location.latitude && driver.location.longitude) {
@@ -79,32 +31,33 @@ DriversPublicRoute.get('/taxis_show_all', asyncHandler(async (req, res) => {
           };
           try {
             const distance = harvesine(passengerLocation, driverLocation); // Distance in meters
-            const distanceInKm = (distance / 1000).toFixed(2); // Convert to kilometers
+            const distanceInKm = parseFloat((distance / 1000).toFixed(2)); // Convert to kilometers
 
-            // Only include drivers within the specified distance limit
-            if (parseFloat(distanceInKm) <= MAX_DISTANCE_KM) {
+            // console.log(`Driver ${driver._id}: ${distanceInKm} km`);
+
+            if (distanceInKm <= MAX_DISTANCE_KM) {
               return {
-                ...driver.toObject(), // Spread the entire driver object
-                distance: distanceInKm, // Add distance in kilometers
+                ...driver.toObject(),
+                distance: distanceInKm,
               };
             }
           } catch (distanceError) {
             console.error("Error calculating distance for driver:", driver._id, distanceError);
-            return null;
           }
         }
-        return null; // Skip drivers with invalid location
+        return null;
       })
-      .filter((driver) => driver); // Filter out null entries
+      .filter((driver) => driver);
 
-    // Sort by distance (nearest first)
     nearbyDrivers.sort((a, b) => a.distance - b.distance);
 
     res.status(200).json({ nearbyDrivers });
   } catch (error) {
-    res.json({ msg: `There was an error while fetching drivers: ${error.message}` });
+    console.error("Error fetching drivers:", error);
+    res.status(500).json({ msg: `Error: ${error.message}` });
   }
 }));
+
 
 
 
