@@ -5,8 +5,57 @@ const asyncHandler = require('express-async-handler')
 const harvesine = require('haversine-distance')
 
 
+// DriversPublicRoute.get('/taxis_show_all', asyncHandler(async (req, res) => {
+//   const { latitude, longitude } = req.query; // Extract query params
+
+//   try {
+//     // Fetch all approved drivers
+//     const drivers = await Driver.find({ approvedItem: true });
+
+//     // If no latitude and longitude provided, just return all taxis
+//     if (!latitude || !longitude) {
+//       return res.json({ taxis: drivers });
+//     }
+
+//     // If latitude and longitude are provided, calculate distances for nearby drivers
+//     const passengerLocation = { latitude: parseFloat(latitude), longitude: parseFloat(longitude) };
+
+//     // Calculate distances and return full driver objects
+//     let nearbyDrivers = drivers
+//       .map((driver) => {
+//         if (driver.location && driver.location.latitude && driver.location.longitude) {
+//           const driverLocation = {
+//             latitude: driver.location.latitude,
+//             longitude: driver.location.longitude,
+//           };
+//           try {
+//             const distance = harvesine(passengerLocation, driverLocation); // Distance in meters
+//             return {
+//               ...driver.toObject(), // Spread the entire driver object
+//               distance: (distance / 1000).toFixed(2), // Add distance in kilometers
+//             };
+//           } catch (distanceError) {
+//             console.error("Error calculating distance for driver:", driver._id, distanceError);
+//             return null;
+//           }
+//         }
+//         return null; // Skip drivers with invalid location
+//       })
+//       .filter((driver) => driver); // Filter out null entries
+
+//     // Sort by distance (nearest first)
+//     nearbyDrivers.sort((a, b) => a.distance - b.distance);
+
+//     res.status(200).json({ nearbyDrivers });
+//   } catch (error) {
+//     res.json({ msg: `There was an error while fetching drivers: ${error.message}` });
+//   }
+// }));
+
+
 DriversPublicRoute.get('/taxis_show_all', asyncHandler(async (req, res) => {
   const { latitude, longitude } = req.query; // Extract query params
+  const MAX_DISTANCE_KM = 10; // Set the maximum distance limit in kilometers (change as needed)
 
   try {
     // Fetch all approved drivers
@@ -30,10 +79,15 @@ DriversPublicRoute.get('/taxis_show_all', asyncHandler(async (req, res) => {
           };
           try {
             const distance = harvesine(passengerLocation, driverLocation); // Distance in meters
-            return {
-              ...driver.toObject(), // Spread the entire driver object
-              distance: (distance / 1000).toFixed(2), // Add distance in kilometers
-            };
+            const distanceInKm = (distance / 1000).toFixed(2); // Convert to kilometers
+
+            // Only include drivers within the specified distance limit
+            if (parseFloat(distanceInKm) <= MAX_DISTANCE_KM) {
+              return {
+                ...driver.toObject(), // Spread the entire driver object
+                distance: distanceInKm, // Add distance in kilometers
+              };
+            }
           } catch (distanceError) {
             console.error("Error calculating distance for driver:", driver._id, distanceError);
             return null;
@@ -51,6 +105,7 @@ DriversPublicRoute.get('/taxis_show_all', asyncHandler(async (req, res) => {
     res.json({ msg: `There was an error while fetching drivers: ${error.message}` });
   }
 }));
+
 
 
 
