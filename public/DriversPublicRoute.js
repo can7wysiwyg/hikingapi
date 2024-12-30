@@ -6,9 +6,11 @@ const harvesine = require('haversine-distance')
 
 
 
+
+
 DriversPublicRoute.get('/taxis_show_all', asyncHandler(async (req, res) => {
-  const { latitude, longitude } = req.query;
-  const MAX_DISTANCE_KM = 16747; // Maximum distance in kilometers
+  const { latitude, longitude, maxDistance } = req.query; // Get maxDistance from query params
+  const MAX_DISTANCE_KM = maxDistance ? parseFloat(maxDistance) : 10; // Default to 10 km if maxDistance is not provided
 
   try {
     const drivers = await Driver.find({ approvedItem: true });
@@ -33,8 +35,6 @@ DriversPublicRoute.get('/taxis_show_all', asyncHandler(async (req, res) => {
             const distance = harvesine(passengerLocation, driverLocation); // Distance in meters
             const distanceInKm = parseFloat((distance / 1000).toFixed(2)); // Convert to kilometers
 
-            // console.log(`Driver ${driver._id}: ${distanceInKm} km`);
-
             if (distanceInKm <= MAX_DISTANCE_KM) {
               return {
                 ...driver.toObject(),
@@ -53,10 +53,10 @@ DriversPublicRoute.get('/taxis_show_all', asyncHandler(async (req, res) => {
 
     res.status(200).json({ nearbyDrivers });
   } catch (error) {
-    console.error("Error fetching drivers:", error);
     res.status(500).json({ msg: `Error: ${error.message}` });
   }
 }));
+
 
 
 
