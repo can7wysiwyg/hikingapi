@@ -55,7 +55,7 @@ const harvesine = require('haversine-distance')
 
 DriversPublicRoute.get('/taxis_show_all', asyncHandler(async (req, res) => {
   const { latitude, longitude } = req.query; // Extract query params
-  const MAX_DISTANCE_KM = 10; // Set the maximum distance limit in kilometers (change as needed)
+  const MAX_DISTANCE_KM = 10811.04; // Set the maximum distance limit in kilometers (change as needed)
 
   try {
     // Fetch all approved drivers
