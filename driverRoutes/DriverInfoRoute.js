@@ -16,7 +16,7 @@ cloudinary.config({
 DriverInfoRoute.post(
   "/driver_info_create",
   verify,
-  verifyDriver,
+
   asyncHandler(async (req, res) => {
     try {
       // Check if driver already exists
