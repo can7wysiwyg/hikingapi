@@ -60,6 +60,64 @@ DriversPublicRoute.get('/taxis_show_all', asyncHandler(async (req, res) => {
 
 
 
+// from search
+
+DriversPublicRoute.get('/taxis_show_all_from_search', asyncHandler(async (req, res) => {
+  const { latitude, longitude, maxDistance } = req.query; // Get maxDistance from query params
+  const MAX_DISTANCE_KM = maxDistance ? parseFloat(maxDistance) : 20; // Default to 10 km if maxDistance is not provided
+
+  try {
+    const drivers = await Driver.find({ approvedItem: true });
+
+    if (!latitude || !longitude) {
+      return res.json({ taxis: drivers });
+    }
+
+    const passengerLocation = {
+      latitude: parseFloat(latitude),
+      longitude: parseFloat(longitude),
+    };
+
+    let nearbyDrivers = drivers
+      .map((driver) => {
+        if (driver.location && driver.location.latitude && driver.location.longitude) {
+          const driverLocation = {
+            latitude: driver.location.latitude,
+            longitude: driver.location.longitude,
+          };
+          try {
+            const distance = harvesine(passengerLocation, driverLocation); // Distance in meters
+            const distanceInKm = parseFloat((distance / 1000).toFixed(2)); // Convert to kilometers
+
+            if (distanceInKm <= MAX_DISTANCE_KM) {
+              return {
+                ...driver.toObject(),
+                distance: distanceInKm,
+              };
+            }
+          } catch (distanceError) {
+            console.error("Error calculating distance for driver:", driver._id, distanceError);
+          }
+        }
+        return null;
+      })
+      .filter((driver) => driver);
+
+    nearbyDrivers.sort((a, b) => a.distance - b.distance);
+
+    res.status(200).json({ nearbyDrivers });
+  } catch (error) {
+    res.status(500).json({ msg: `Error: ${error.message}` });
+  }
+}));
+
+
+
+
+
+
+// 
+
 
 
 DriversPublicRoute.get('/drivers_show_all', asyncHandler(async(req, res) => {
