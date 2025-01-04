@@ -7,47 +7,75 @@ const SharedTaxiBooking = require('../models/SharedTaxiBooking')
 const verify = require('../middleware/verify')
 const verifyDriver = require('../middleware/verifyDriver')
 
-DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) => {
-    try {
-      const { taxiId, routeName, startLocation, endLocation, fare } = req.body;
+// DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) => {
+//     try {
+//       const { taxiId, routeName, startLocation, endLocation, fare } = req.body;
   
-      // Validate data
-      if (!taxiId || !routeName || !startLocation || !endLocation || !fare) {
-        return res.status(400).json({ success: false, message: 'All fields are required' });
-      }
+//       // Validate data
+//       if (!taxiId || !routeName || !startLocation || !endLocation || !fare) {
+//         return res.status(400).json({ success: false, message: 'All fields are required' });
+//       }
   
-      const route = new TaxiRoute({
-        taxiId,
-        routeName,
-        startLocation,
-        endLocation,
-        fare,
-      });
+//       const route = new TaxiRoute({
+//         taxiId,
+//         routeName,
+//         startLocation,
+//         endLocation,
+//         fare,
+//       });
   
-      await route.save();
-      res.status(201).json({ success: true, message: 'Route created successfully', route });
-    } catch (error) {
-      res.status(500).json({ success: false, message: error.message });
-    }
-  });
-  
-  
+//       await route.save();
+//       res.status(201).json({ success: true, message: 'Route created successfully', route });
+//     } catch (error) {
+//       res.status(500).json({ success: false, message: error.message });
+//     }
+//   });
 
-  // DriverTaxiRoute.put('/driver/routes/:id', verify, verifyDriver, async (req, res) => {
-  //   try {
-  //     const route = await TaxiRoute.findOneAndUpdate(
-  //       { _id: req.params.id, taxiId: req.body.taxiId },
-  //       req.body,
-  //       { new: true }
-  //     );
+
+
+DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) => {
+  try {
+    const { taxiId, routeName, startLocation, endLocation, fare } = req.body;
+
+    // Validate data
+    if (!taxiId || !routeName || !startLocation || !endLocation || !fare) {
+      return res.status(400).json({ success: false, message: 'All fields are required' });
+    }
+
+    // Validate that startLocation and endLocation have coordinates and placeName
+    if (
+      !startLocation.coordinates || !Array.isArray(startLocation.coordinates) ||
+      startLocation.coordinates.length !== 2 ||
+      !startLocation.placeName ||
+      !endLocation.coordinates || !Array.isArray(endLocation.coordinates) ||
+      endLocation.coordinates.length !== 2 ||
+      !endLocation.placeName
+    ) {
+      return res.status(400).json({ success: false, message: 'Invalid location data' });
+    }
+
+    // Create a new TaxiRoute document
+    const route = new TaxiRoute({
+      taxiId,
+      routeName,
+      startLocation,
+      endLocation,
+      fare,
+    });
+
+    // Save the route
+    await route.save();
+    
+    // Respond with success message and created route data
+    res.status(201).json({ success: true, message: 'Route created successfully', route });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+
   
-  //     if (!route) return res.status(404).json({ success: false, message: 'Route not found' });
   
-  //     res.status(200).json({ success: true, message: 'Route updated successfully', route });
-  //   } catch (error) {
-  //     res.status(500).json({ success: false, message: error.message });
-  //   }
-  // });
 
 
   DriverTaxiRoute.get('/driver_see_my_routes/:id', verify, verifyDriver, async(req, res) => {
