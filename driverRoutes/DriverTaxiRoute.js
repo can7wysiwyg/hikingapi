@@ -31,10 +31,10 @@ const verifyDriver = require('../middleware/verifyDriver')
 //     }
 //   });
 
-
-
 DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) => {
   try {
+    console.log('Request body:', req.body); // Log the body of the request
+
     const { taxiId, routeName, startLocation, endLocation, fare } = req.body;
 
     // Validate data
@@ -44,11 +44,11 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
 
     // Validate that startLocation and endLocation have coordinates and placeName
     if (
-      !startLocation.coordinates || !Array.isArray(startLocation.coordinates) ||
-      startLocation.coordinates.length !== 2 ||
+      !startLocation.coordinates || !Array.isArray(startLocation.coordinates.coordinates) ||
+      startLocation.coordinates.coordinates.length !== 2 ||
       !startLocation.placeName ||
-      !endLocation.coordinates || !Array.isArray(endLocation.coordinates) ||
-      endLocation.coordinates.length !== 2 ||
+      !endLocation.coordinates || !Array.isArray(endLocation.coordinates.coordinates) ||
+      endLocation.coordinates.coordinates.length !== 2 ||
       !endLocation.placeName
     ) {
       return res.status(400).json({ success: false, message: 'Invalid location data' });
@@ -63,6 +63,9 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
       fare,
     });
 
+
+    console.log(route)
+
     // Save the route
     await route.save();
 
@@ -73,7 +76,7 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
-  
+
 
 
   DriverTaxiRoute.get('/driver_see_my_routes/:id', verify, verifyDriver, async(req, res) => {
