@@ -1,11 +1,9 @@
-const mongoose = require('mongoose');
-
 const LocationSchema = new mongoose.Schema({
   coordinates: {
     type: { type: String, enum: ['Point'], default: 'Point' },
     coordinates: { type: [Number], required: true }, // [longitude, latitude]
   },
-  placeName: { type: String, required: true },
+  placeName: { type: String, required: true }, // Should match the frontend's 'placeName' key
 });
 
 const RouteSchema = new mongoose.Schema({
@@ -16,5 +14,3 @@ const RouteSchema = new mongoose.Schema({
   fare: { type: Number, required: true },
   createdAt: { type: Date, default: Date.now },
 });
-
-module.exports = mongoose.model('TaxiRoute', RouteSchema);

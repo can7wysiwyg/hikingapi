@@ -65,16 +65,14 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
 
     // Save the route
     await route.save();
-    
+
     // Respond with success message and created route data
     res.status(201).json({ success: true, message: 'Route created successfully', route });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Error in backend:', error);  // Log the error
+    res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
-
-
-  
   
 
 
