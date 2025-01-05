@@ -168,7 +168,7 @@ TaxiRoutePublic.post('/book_non_shared_taxi', verify, async (req, res) => {
     } = req.body;
 
 
-    console.log(dropoffCoordinates)
+    console.log(req.body)
 
     // Validate required fields
     if (
