@@ -159,7 +159,7 @@ TaxiRoutePublic.post('/book_non_shared_taxi', verify, async (req, res) => {
     const {
       userId,
       driverId,
-      pickupLocation,
+    
       dropoffLocation,
       pickupCoordinates,
       dropoffCoordinates,
@@ -168,13 +168,12 @@ TaxiRoutePublic.post('/book_non_shared_taxi', verify, async (req, res) => {
     } = req.body;
 
 
-    console.log(req.body)
-
+   
     // Validate required fields
     if (
       !userId ||
       !driverId ||
-      !pickupLocation ||
+      
       !dropoffLocation ||
       !pickupCoordinates ||
       !dropoffCoordinates ||
@@ -202,7 +201,7 @@ TaxiRoutePublic.post('/book_non_shared_taxi', verify, async (req, res) => {
     const newRide = new Ride({
       userId,
       driverId,
-      pickupLocation,
+  
       dropoffLocation,
       pickupCoordinates,
       dropoffCoordinates,
@@ -211,6 +210,8 @@ TaxiRoutePublic.post('/book_non_shared_taxi', verify, async (req, res) => {
       confirmationCode,
       rideStatus: 'requested', // Initial ride status
     });
+
+    console.log(newRide)
 
     const savedRide = await newRide.save();
 
