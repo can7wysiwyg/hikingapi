@@ -167,6 +167,9 @@ TaxiRoutePublic.post('/book_non_shared_taxi', verify, async (req, res) => {
       time,
     } = req.body;
 
+
+    console.log(dropoffCoordinates)
+
     // Validate required fields
     if (
       !userId ||
