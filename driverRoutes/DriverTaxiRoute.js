@@ -7,29 +7,6 @@ const SharedTaxiBooking = require('../models/SharedTaxiBooking')
 const verify = require('../middleware/verify')
 const verifyDriver = require('../middleware/verifyDriver')
 
-// DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) => {
-//     try {
-//       const { taxiId, routeName, startLocation, endLocation, fare } = req.body;
-  
-//       // Validate data
-//       if (!taxiId || !routeName || !startLocation || !endLocation || !fare) {
-//         return res.status(400).json({ success: false, message: 'All fields are required' });
-//       }
-  
-//       const route = new TaxiRoute({
-//         taxiId,
-//         routeName,
-//         startLocation,
-//         endLocation,
-//         fare,
-//       });
-  
-//       await route.save();
-//       res.status(201).json({ success: true, message: 'Route created successfully', route });
-//     } catch (error) {
-//       res.status(500).json({ success: false, message: error.message });
-//     }
-//   });
 
 DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) => {
   try {
