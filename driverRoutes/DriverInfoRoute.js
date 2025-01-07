@@ -52,11 +52,9 @@ DriverInfoRoute.post(
       if (
         !req.files ||
         !req.files.driverCarPhoto ||
-        !req.files.drivingLicence ||
-        !req.files.idPhotoFront ||
-        !req.files.idPhotoBack
+        !req.files.drivingLicence 
       ) {
-        return res.json({ msg: "All photos (Car Photo, Driving Licence, ID Front, ID Back) are required." });
+        return res.json({ msg: "All photos (Car Photo" });
       }
 
       // Create a new driver object
@@ -76,9 +74,7 @@ DriverInfoRoute.post(
 
       driver.driverCarPhoto = await uploadToCloudinary(req.files.driverCarPhoto);
       driver.drivingLicence = await uploadToCloudinary(req.files.drivingLicence);
-      driver.idPhotoFront = await uploadToCloudinary(req.files.idPhotoFront);
-      driver.idPhotoBack = await uploadToCloudinary(req.files.idPhotoBack);
-
+      
       // Save the driver object
       await driver.save();
 

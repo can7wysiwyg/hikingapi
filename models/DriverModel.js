@@ -38,15 +38,7 @@ const DriverSchema = mongoose.Schema({
 
       },
 
-      idPhotoFront: {
-        type: String,
-        required: true
-    },
-
-    idPhotoBack: {
-        type: String,
-        required: true
-    },
+      
 
     drivingLicence: {
         type: String,

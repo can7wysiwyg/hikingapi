@@ -41,7 +41,7 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
     });
 
 
-    console.log(route)
+  
 
     // Save the route
     await route.save();
@@ -79,7 +79,7 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
 
   // de-boarding passenger(s)
 
-  DriverTaxiRoute.get('/show_boarded_taxi_to_owner/:id', verify, verifyDriver,  async (req, res) => {
+  DriverTaxiRoute.get('/show_boarded_taxi_to_owner/:id', verify, verifyDriver,   async (req, res) => {
     try {
       const { id } = req.params;
   
