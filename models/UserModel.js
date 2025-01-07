@@ -30,6 +30,12 @@ const UserSchema = mongoose.Schema({
         type: String,
         default: null
     },
+    isFirstTimeUser: {
+         type: Boolean,
+          default: true 
+        
+        }, 
+
     passwordResetCode: {
         type: Number, 
         default: null

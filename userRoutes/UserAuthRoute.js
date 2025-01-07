@@ -104,7 +104,7 @@ UserAuth.post("/verify_email", asyncHandler(async (req, res) => {
     // Remove the user from the TemporaryUser collection
     await TemporaryUser.deleteOne({ email });
 
-    res.status(201).json({ msg: "Email verified, account created successfully!" });
+    res.status(201).json({ msg: "Email verified, account created successfully! Please Login" });
   } catch (error) {
     console.error(`Error during verification: ${error.stack}`);
     res.status(500).json({ msg: `There was an error: ${error.message}` });
@@ -184,7 +184,11 @@ UserAuth.post("/user_login", asyncHandler(async(req, res) => {
       const accesstoken = createAccessToken({id: user.id})
       
   
-      res.json({accesstoken}) })
+      res.json({accesstoken,
+
+        isFirstTimeUser: userExists.isFirstTimeUser
+
+      }) })
 
 
     
@@ -299,7 +303,7 @@ UserAuth.get('/auth/user',verify, asyncHandler(async(req, res) => {
   
       await user.save();
   
-      res.status(200).json({ msg: "Password reset successfully." });
+      res.status(200).json({ msg: "Password reset successfully. Please Login" });
   
     } catch (error) {
       res.status(500).json({ msg: `There was a problem: ${error.message}` });
