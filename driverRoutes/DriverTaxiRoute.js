@@ -8,10 +8,49 @@ const verify = require('../middleware/verify')
 const verifyDriver = require('../middleware/verifyDriver')
 
 
+
+DriverTaxiRoute.put(
+  '/driver_start_trip_non_shared/:tripId/:driverId',
+  verify,
+  verifyDriver,
+  async (req, res) => {
+    try {
+      const { tripId, driverId } = req.params;
+
+      // Check if the driver exists in the Ride collection
+      const ride = await Ride.findOne({ _id: tripId, driverId: driverId });
+
+      if (!ride) {
+        return res.status(404).json({ msg: "Ride or driver does not exist" });
+      }
+
+      // Ensure the rideStatus is appropriate for starting a trip
+      if (ride.rideStatus !== 'requested') {
+        return res.status(400).json({
+          msg: `Ride status is '${ride.rideStatus}' and cannot be started.`,
+        });
+      }
+
+      // Update the ride status to "in transit"
+      ride.rideStatus = 'in transit';
+      await ride.save();
+
+      res.status(200).json({
+        msg: "Ride status updated to 'in transit'",
+        updatedRide: ride,
+      });
+    } catch (error) {
+      console.error('Error starting trip:', error.message);
+      res.status(500).json({ msg: `There was a problem: ${error.message}` });
+    }
+  }
+);
+
+
+
 DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) => {
   try {
-    console.log('Request body:', req.body); // Log the body of the request
-
+    
     const { taxiId, routeName, startLocation, endLocation, fare } = req.body;
 
     // Validate data
