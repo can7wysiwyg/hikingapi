@@ -18,4 +18,8 @@ const RouteSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
+RouteSchema.index({ 'endLocation.coordinates': '2dsphere' });
+RouteSchema.index({ 'startLocation.coordinates': '2dsphere' });
+
+
 module.exports = mongoose.model('TaxiRoute', RouteSchema)

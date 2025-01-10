@@ -39,6 +39,35 @@ db.once('open', function(){
   });
 
 
+// mongoose.connect(process.env.MONGOURL, { useNewUrlParser: true, useUnifiedTopology: true });
+
+// const db = mongoose.connection;
+
+// // Handle connection errors
+// db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+
+// // Once connected, check the indexes
+// db.once('open', async function () {
+//   console.log('Connected to database');
+
+//   try {
+//     // Get the native MongoDB driver collection
+//     const collection = db.collection('taxiroutes'); // Replace 'taxiRoutes' with your collection name
+
+//     // List indexes
+//     const indexes = await collection.indexes();
+
+//     // Log the indexes
+//     console.log('Indexes:', indexes);
+//   } catch (err) {
+//     console.error('Error checking indexes:', err);
+//   } finally {
+//     // Close the connection
+//     mongoose.connection.close();
+//   }
+// });
+
+
   app.use(cors())
   app.use(express.json({limit: '50mb'}))
   app.use(express.urlencoded({extended: true, limit: '50mb'}))

@@ -27,6 +27,39 @@ TaxiRoutePublic.get('/taxi_route/:id',  async(req, res) => {
   })
 
 
+  TaxiRoutePublic.get('/show_taxis_by_coordinates', async (req, res) => {
+    try {
+      const { longitude, latitude } = req.query;
+  
+      if (!longitude || !latitude) {
+        return res.status(400).json({ error: 'Longitude and latitude are required' });
+      }
+  
+      // Define the search radius (15 km = 15,000 meters)
+      const maxDistance = 15000; // in meters
+  
+      // Perform the geospatial query
+      const foundTaxis = await TaxiRoute.find({
+        'endLocation.coordinates': {
+          $near: {
+            $geometry: {
+              type: 'Point',
+              coordinates: [parseFloat(longitude), parseFloat(latitude)], // [longitude, latitude]
+            },
+            $maxDistance: maxDistance,
+          },
+        },
+      });
+  
+      // Return the found taxis
+      res.json({ foundTaxis });
+    } catch (error) {
+      console.error('Error fetching taxis:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+  
+
 
   const generateConfirmationCode = () => {
     // Generate a random 6-character alphanumeric confirmation code
