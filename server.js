@@ -29,6 +29,7 @@ const UserFirstRoute = require('./userRoutes/UserFirstRoute')
 
 
 
+
 mongoose.connect(process.env.MONGOURL)
 
 const db = mongoose.connection
@@ -37,6 +38,7 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', function(){
     console.log("connected to database");
   });
+
 
 
 // mongoose.connect(process.env.MONGOURL, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -52,7 +54,7 @@ db.once('open', function(){
 
 //   try {
 //     // Get the native MongoDB driver collection
-//     const collection = db.collection('taxiroutes'); // Replace 'taxiRoutes' with your collection name
+//     const collection = db.collection('drivers'); // Replace 'taxiRoutes' with your collection name
 
 //     // List indexes
 //     const indexes = await collection.indexes();
@@ -66,6 +68,8 @@ db.once('open', function(){
 //     mongoose.connection.close();
 //   }
 // });
+
+
 
 
   app.use(cors())

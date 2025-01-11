@@ -15,11 +15,22 @@ const DriverSchema = mongoose.Schema({
         required: true
 
     },
+
     location: {
-        latitude: { type: Number, default: null },
-        longitude: { type: Number, default: null },
+        type: {
+          type: String, // "type" must be "Point"
+          enum: ['Point'],
+          required: true,
+        },
+        coordinates: {
+          type: [Number], // Array of numbers: [longitude, latitude]
+          required: true,
+        },
       },
-      lastUpdated: { type: Date },
+  
+
+     
+          lastUpdated: { type: Date },
 
     
     driverCarPhoto: {
@@ -59,6 +70,9 @@ const DriverSchema = mongoose.Schema({
 }, {
     timestamps: true
 })
+
+DriverSchema.index({ location: '2dsphere' });
+
 
 
 module.exports = mongoose.model('Driver', DriverSchema)
