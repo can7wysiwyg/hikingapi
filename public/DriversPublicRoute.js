@@ -7,58 +7,6 @@ const harvesine = require('haversine-distance')
 
 
 
-
-// DriversPublicRoute.get('/taxis_show_all', asyncHandler(async (req, res) => {
-//   const { latitude, longitude, maxDistance } = req.query; // Get maxDistance from query params
-//   const MAX_DISTANCE_KM = maxDistance ? parseFloat(maxDistance) : 10; // Default to 10 km if maxDistance is not provided
-
-//   try {
-//     const drivers = await Driver.find({ approvedItem: true });
-
-//     if (!latitude || !longitude) {
-//       return res.json({ taxis: drivers });
-//     }
-
-//     const passengerLocation = {
-//       latitude: parseFloat(latitude),
-//       longitude: parseFloat(longitude),
-//     };
-
-//     let nearbyDrivers = drivers
-//       .map((driver) => {
-//         if (driver.location && driver.location.latitude && driver.location.longitude) {
-//           const driverLocation = {
-//             latitude: driver.location.latitude,
-//             longitude: driver.location.longitude,
-//           };
-//           try {
-//             const distance = harvesine(passengerLocation, driverLocation); // Distance in meters
-//             const distanceInKm = parseFloat((distance / 1000).toFixed(2)); // Convert to kilometers
-
-//             if (distanceInKm <= MAX_DISTANCE_KM) {
-//               return {
-//                 ...driver.toObject(),
-//                 distance: distanceInKm,
-//               };
-//             }
-//           } catch (distanceError) {
-//             console.error("Error calculating distance for driver:", driver._id, distanceError);
-//           }
-//         }
-//         return null;
-//       })
-//       .filter((driver) => driver);
-
-//     nearbyDrivers.sort((a, b) => a.distance - b.distance);
-
-//     res.status(200).json({ nearbyDrivers });
-//   } catch (error) {
-//     res.status(500).json({ msg: `Error: ${error.message}` });
-//   }
-// }));
-
-
-
 DriversPublicRoute.get('/taxis_show_all', asyncHandler(async (req, res) => {
   const { latitude, longitude, maxDistance } = req.query; // Get maxDistance from query params
   const MAX_DISTANCE_KM = maxDistance ? parseFloat(maxDistance) : 10; // Default to 10 km if maxDistance is not provided
@@ -108,57 +56,44 @@ DriversPublicRoute.get('/taxis_show_all', asyncHandler(async (req, res) => {
 
 DriversPublicRoute.get('/taxis_show_all_from_search', asyncHandler(async (req, res) => {
   const { latitude, longitude, maxDistance } = req.query; // Get maxDistance from query params
-  const MAX_DISTANCE_KM = maxDistance ? parseFloat(maxDistance) : 20; // Default to 10 km if maxDistance is not provided
+  const MAX_DISTANCE_KM = maxDistance ? parseFloat(maxDistance) : 20; // Default to 20 km if maxDistance is not provided
 
   try {
-    const drivers = await Driver.find({ approvedItem: true });
-
+    // If no latitude or longitude is provided, return all approved drivers
     if (!latitude || !longitude) {
+      const drivers = await Driver.find({ approvedItem: true });
       return res.json({ taxis: drivers });
     }
 
+    // Convert to float and ensure they're numbers
     const passengerLocation = {
-      latitude: parseFloat(latitude),
-      longitude: parseFloat(longitude),
+      type: "Point", // GeoJSON type
+      coordinates: [parseFloat(longitude), parseFloat(latitude)], // Longitude, Latitude in that order
     };
 
-    let nearbyDrivers = drivers
-      .map((driver) => {
-        if (driver.location && driver.location.latitude && driver.location.longitude) {
-          const driverLocation = {
-            latitude: driver.location.latitude,
-            longitude: driver.location.longitude,
-          };
-          try {
-            const distance = harvesine(passengerLocation, driverLocation); // Distance in meters
-            const distanceInKm = parseFloat((distance / 1000).toFixed(2)); // Convert to kilometers
-
-            if (distanceInKm <= MAX_DISTANCE_KM) {
-              return {
-                ...driver.toObject(),
-                distance: distanceInKm,
-              };
-            }
-          } catch (distanceError) {
-            console.error("Error calculating distance for driver:", driver._id, distanceError);
-          }
-        }
-        return null;
-      })
-      .filter((driver) => driver);
-
-    nearbyDrivers.sort((a, b) => a.distance - b.distance);
+    // Find nearby drivers using geospatial query
+    const nearbyDrivers = await Driver.aggregate([
+      {
+        $geoNear: {
+          near: passengerLocation, // Use passenger's location
+          distanceField: "distance", // Field to store the calculated distance
+          maxDistance: MAX_DISTANCE_KM * 1000, // MongoDB's maxDistance is in meters, so we multiply km by 1000
+          spherical: true, // Ensure the calculation uses spherical geometry
+        },
+      },
+      {
+        $match: { approvedItem: true }, // Ensure that only approved drivers are returned
+      },
+      {
+        $sort: { distance: 1 }, // Sort by distance (nearest first)
+      },
+    ]);
 
     res.status(200).json({ nearbyDrivers });
   } catch (error) {
     res.status(500).json({ msg: `Error: ${error.message}` });
   }
 }));
-
-
-
-
-
 
 // 
 
