@@ -64,73 +64,58 @@ TaxiRoutePublic.get('/taxi_route/:id',  async(req, res) => {
 
   TaxiRoutePublic.get('/show_taxis_by_coordinates', async (req, res) => {
     try {
-      const { userLongitude, userLatitude,  } = req.query;
+      
+      const { userLongitude, userLatitude, destLongitude, destLatitude } = req.query;
 
-      // const { userLongitude, userLatitude, destLongitude, destLatitude } = req.query;
-
-      const nearbyDrivers = await Driver.find({
-        taxiType: 'shared',
+  
+      if (!userLongitude || !userLatitude || !destLongitude || !destLatitude) {
+        return res.status(400).json({ error: 'All coordinates (user and destination) are required' });
+      }
+  
+      // Define search radii
+      const userMaxDistance = 200; // 2 km for proximity to user
+      const destMaxDistance = 300; // 15 km for shared taxi destination proximity
+  
+      // Step 1: Find shared taxis near the user
+      const nearbySharedTaxis = await Driver.find({
+        taxiType: 'shared', // Filter for shared taxis only
         location: {
           $near: {
             $geometry: {
               type: 'Point',
-              coordinates: [userLongitude, userLatitude],
+              coordinates: [parseFloat(userLongitude), parseFloat(userLatitude)], // User's current location
             },
-            $maxDistance: 200, // Distance in meters (2 km)
+            $maxDistance: userMaxDistance,
           },
         },
       });
-      res.json(nearbyDrivers);
-      
   
-      // if (!userLongitude || !userLatitude || !destLongitude || !destLatitude) {
-      //   return res.status(400).json({ error: 'All coordinates (user and destination) are required' });
-      // }
+      // Step 2: Filter for taxis heading toward the user's destination
+      const filteredSharedTaxis = [];
+      for (const taxi of nearbySharedTaxis) {
+        const matchingRoute = await TaxiRoute.findOne({
+          driver: taxi._id, // Match the shared taxi to its route
+          'endLocation.coordinates': {
+            $near: {
+              $geometry: {
+                type: 'Point',
+                coordinates: [parseFloat(destLongitude), parseFloat(destLatitude)], // Destination coordinates
+              },
+              $maxDistance: destMaxDistance,
+            },
+          },
+        });
   
-      // // Define search radii
-      // const userMaxDistance = 200; // 2 km for proximity to user
-      // const destMaxDistance = 300; // 15 km for shared taxi destination proximity
+        if (matchingRoute) {
+          filteredSharedTaxis.push({
+            driver: taxi,
+            route: matchingRoute,
+          });
+        }
+      }
   
-      // // Step 1: Find shared taxis near the user
-      // const nearbySharedTaxis = await Driver.find({
-      //   taxiType: 'shared', // Filter for shared taxis only
-      //   location: {
-      //     $near: {
-      //       $geometry: {
-      //         type: 'Point',
-      //         coordinates: [parseFloat(userLongitude), parseFloat(userLatitude)], // User's current location
-      //       },
-      //       $maxDistance: userMaxDistance,
-      //     },
-      //   },
-      // });
-  
-      // // Step 2: Filter for taxis heading toward the user's destination
-      // const filteredSharedTaxis = [];
-      // for (const taxi of nearbySharedTaxis) {
-      //   const matchingRoute = await TaxiRoute.findOne({
-      //     driver: taxi._id, // Match the shared taxi to its route
-      //     'endLocation.coordinates': {
-      //       $near: {
-      //         $geometry: {
-      //           type: 'Point',
-      //           coordinates: [parseFloat(destLongitude), parseFloat(destLatitude)], // Destination coordinates
-      //         },
-      //         $maxDistance: destMaxDistance,
-      //       },
-      //     },
-      //   });
-  
-      //   if (matchingRoute) {
-      //     filteredSharedTaxis.push({
-      //       driver: taxi,
-      //       route: matchingRoute,
-      //     });
-      //   }
-      // }
-  
-      // // Return the filtered and prioritized shared taxis
-      // res.json({ sharedTaxis: filteredSharedTaxis });
+      // Return the filtered and prioritized shared taxis
+      res.json({ sharedTaxis: filteredSharedTaxis });
     } catch (error) {
       // console.error('Error fetching shared taxis:', error);
       res.status(500).json({ error: `Internal server error ${error}` });
