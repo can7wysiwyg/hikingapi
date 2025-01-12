@@ -27,58 +27,31 @@ TaxiRoutePublic.get('/taxi_route/:id',  async(req, res) => {
   })
 
 
-  // TaxiRoutePublic.get('/show_taxis_by_coordinates', async (req, res) => {
-  //   try {
-  //     const { longitude, latitude } = req.query;
-  
-  //     if (!longitude || !latitude) {
-  //       return res.status(400).json({ error: 'Longitude and latitude are required' });
-  //     }
-  
-  //     // Define the search radius (15 km = 15,000 meters)
-  //     const maxDistance = 15000; // in meters
-  
-  //     // Perform the geospatial query
-  //     const foundTaxis = await TaxiRoute.find({
-  //       'endLocation.coordinates': {
-  //         $near: {
-  //           $geometry: {
-  //             type: 'Point',
-  //             coordinates: [parseFloat(longitude), parseFloat(latitude)], // [longitude, latitude]
-  //           },
-  //           $maxDistance: maxDistance,
-  //         },
-  //       },
-  //     });
-  
-  //     // Return the found taxis
-  //     res.json({ foundTaxis });
-  //   } catch (error) {
-  //     console.error('Error fetching taxis:', error);
-  //     res.status(500).json({ error: 'Internal server error' });
-  //   }
-  // });
-
-
-
-
+    
+     
   TaxiRoutePublic.get('/show_taxis_by_coordinates', async (req, res) => {
     try {
-      
       const { userLongitude, userLatitude, destLongitude, destLatitude } = req.query;
-
   
       if (!userLongitude || !userLatitude || !destLongitude || !destLatitude) {
-        return res.status(400).json({ error: 'All coordinates (user and destination) are required' });
+        return res.status(400).json({ error: 'All coordinates (user and destination) are required.' });
       }
   
-      // Define search radii
-      const userMaxDistance = 200; // 2 km for proximity to user
-      const destMaxDistance = 300; // 15 km for shared taxi destination proximity
+      // const userMaxDistanceKm = 5; // Max distance to user in km
+      // const destMaxDistanceKm = 19; // Max distance to destination in km
+  
+      // const userMaxDistance = userMaxDistanceKm * 1000; // Convert to meters
+      // const destMaxDistance = destMaxDistanceKm * 1000; // Convert to meters
+
+
+      const userMaxDistance = 800; // 200 meters
+const destMaxDistance = 300; // 300 meters
+
+      
   
       // Step 1: Find shared taxis near the user
       const nearbySharedTaxis = await Driver.find({
-        taxiType: 'shared', // Filter for shared taxis only
+        taxiType: 'shared', // Only shared taxis
         location: {
           $near: {
             $geometry: {
@@ -90,11 +63,12 @@ TaxiRoutePublic.get('/taxi_route/:id',  async(req, res) => {
         },
       });
   
-      // Step 2: Filter for taxis heading toward the user's destination
+      
+      // Step 2: Filter for taxis heading to the destination
       const filteredSharedTaxis = [];
       for (const taxi of nearbySharedTaxis) {
         const matchingRoute = await TaxiRoute.findOne({
-          driver: taxi._id, // Match the shared taxi to its route
+          taxiId: taxi._id, // Match the taxi to its route
           'endLocation.coordinates': {
             $near: {
               $geometry: {
@@ -114,11 +88,16 @@ TaxiRoutePublic.get('/taxi_route/:id',  async(req, res) => {
         }
       }
   
-      // Return the filtered and prioritized shared taxis
+      
+      // Return filtered taxis
+      if (!filteredSharedTaxis.length) {
+        return res.json({ sharedTaxis: [], message: 'No shared taxis match your search criteria.' });
+      }
+  
       res.json({ sharedTaxis: filteredSharedTaxis });
     } catch (error) {
-      // console.error('Error fetching shared taxis:', error);
-      res.status(500).json({ error: `Internal server error ${error}` });
+      console.error('Error fetching shared taxis:', error);
+      res.status(500).json({ error: `Internal server error: ${error.message}` });
     }
   });
   
