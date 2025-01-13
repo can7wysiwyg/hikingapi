@@ -170,7 +170,7 @@ DriversPublicRoute.get('/taxis_show_taxi_type_shared', asyncHandler(async (req, 
         },
       },
       {
-        $match: { approvedItem: true, taxiType: "non-shared" }, // Ensure only approved non-shared drivers are returned
+        $match: { approvedItem: true, taxiType: "shared" }, // Ensure only approved non-shared drivers are returned
       },
       {
         $sort: { distance: 1 }, // Sort by distance (nearest first)
