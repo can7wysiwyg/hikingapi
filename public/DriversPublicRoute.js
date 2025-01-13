@@ -98,6 +98,95 @@ DriversPublicRoute.get('/taxis_show_all_from_search', asyncHandler(async (req, r
 // 
 
 
+DriversPublicRoute.get('/taxis_show_taxi_type_non', asyncHandler(async (req, res) => { 
+  const { latitude, longitude } = req.query; // Get maxDistance from query params
+  const MAX_DISTANCE_KM =  20; // Default to 20 km if maxDistance is not provided
+
+  try {
+    // If no latitude or longitude is provided, return all approved drivers with taxiType: "non-shared"
+    if (!latitude || !longitude) {
+      const drivers = await Driver.find({ approvedItem: true, taxiType: "non-shared" });
+      return res.json({ taxis: drivers });
+    }
+
+    // Convert to float and ensure they're numbers
+    const passengerLocation = {
+      type: "Point", // GeoJSON type
+      coordinates: [parseFloat(longitude), parseFloat(latitude)], // Longitude, Latitude in that order
+    };
+
+    // Find nearby drivers using geospatial query
+    const nearbyDrivers = await Driver.aggregate([
+      {
+        $geoNear: {
+          near: passengerLocation, // Use passenger's location
+          distanceField: "distance", // Field to store the calculated distance
+          maxDistance: MAX_DISTANCE_KM * 1000, // MongoDB's maxDistance is in meters, so we multiply km by 1000
+          spherical: true, // Ensure the calculation uses spherical geometry
+        },
+      },
+      {
+        $match: { approvedItem: true, taxiType: "non-shared" }, // Ensure only approved non-shared drivers are returned
+      },
+      {
+        $sort: { distance: 1 }, // Sort by distance (nearest first)
+      },
+    ]);
+
+    res.status(200).json({ nearbyDrivers });
+  } catch (error) {
+    res.status(500).json({ msg: `Error: ${error.message}` });
+  }
+}));
+
+
+
+
+DriversPublicRoute.get('/taxis_show_taxi_type_shared', asyncHandler(async (req, res) => { 
+  const { latitude, longitude } = req.query; // Get maxDistance from query params
+  const MAX_DISTANCE_KM =  20; // Default to 20 km if maxDistance is not provided
+
+  try {
+    // If no latitude or longitude is provided, return all approved drivers with taxiType: "non-shared"
+    if (!latitude || !longitude) {
+      const drivers = await Driver.find({ approvedItem: true, taxiType: "shared" });
+      return res.json({ taxis: drivers });
+    }
+
+    // Convert to float and ensure they're numbers
+    const passengerLocation = {
+      type: "Point", // GeoJSON type
+      coordinates: [parseFloat(longitude), parseFloat(latitude)], // Longitude, Latitude in that order
+    };
+
+    // Find nearby drivers using geospatial query
+    const nearbyDrivers = await Driver.aggregate([
+      {
+        $geoNear: {
+          near: passengerLocation, // Use passenger's location
+          distanceField: "distance", // Field to store the calculated distance
+          maxDistance: MAX_DISTANCE_KM * 1000, // MongoDB's maxDistance is in meters, so we multiply km by 1000
+          spherical: true, // Ensure the calculation uses spherical geometry
+        },
+      },
+      {
+        $match: { approvedItem: true, taxiType: "non-shared" }, // Ensure only approved non-shared drivers are returned
+      },
+      {
+        $sort: { distance: 1 }, // Sort by distance (nearest first)
+      },
+    ]);
+
+    res.status(200).json({ nearbyDrivers });
+  } catch (error) {
+    res.status(500).json({ msg: `Error: ${error.message}` });
+  }
+}));
+
+
+
+
+
 
 DriversPublicRoute.get('/drivers_show_all', asyncHandler(async(req, res) => {
 
