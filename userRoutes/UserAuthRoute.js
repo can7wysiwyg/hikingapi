@@ -173,6 +173,11 @@ UserAuth.post("/user_login", asyncHandler(async(req, res) => {
   const passwordMatch = await bcrypt.compare(password, userExists.password);
 
   if (passwordMatch) {
+
+    await User.findByIdAndUpdate(userExists._id, {
+      fcmToken: null,
+      devicePlatform: null
+  });
     
     let refreshtoken = createRefreshToken({id: userExists._id})
 

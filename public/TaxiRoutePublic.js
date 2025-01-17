@@ -37,13 +37,7 @@ TaxiRoutePublic.get('/taxi_route/:id',  async(req, res) => {
         return res.status(400).json({ error: 'All coordinates (user and destination) are required.' });
       }
   
-      // const userMaxDistanceKm = 5; // Max distance to user in km
-      // const destMaxDistanceKm = 19; // Max distance to destination in km
-  
-      // const userMaxDistance = userMaxDistanceKm * 1000; // Convert to meters
-      // const destMaxDistance = destMaxDistanceKm * 1000; // Convert to meters
-
-
+      
       const userMaxDistance = 800; // 200 meters
 const destMaxDistance = 300; // 300 meters
 

@@ -43,6 +43,15 @@ const UserSchema = mongoose.Schema({
     passwordResetCodeExpires: {
         type: Date, 
         default: null
+    },
+    fcmToken: {
+        type: String,
+        default: null
+    },
+    devicePlatform: {  // Useful for platform-specific notifications
+        type: String,
+        enum: ['ios', 'android', 'web'],
+        default: null
     }
 }, {
     timestamps: true
