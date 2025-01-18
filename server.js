@@ -26,9 +26,8 @@ const DriverLocationRoute = require('./driverRoutes/DriverLocationRoute')
 const NearbyTaxisRoute = require('./public/NearbyTaxisRoute')
 const UserFirstRoute = require('./userRoutes/UserFirstRoute')
 const NotsEndP = require('./notifications/NotsEndP')
-const admin = require('firebase-admin')
-const serviceAccount = require('./firbase-service-key.json')
-
+// const { GoogleAuth } = require('google-auth-library')
+// const ServiceAccount = require('./firbase-service-key.json')
 
 
 
@@ -41,6 +40,70 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', function(){
     console.log("connected to database");
   });
+
+
+
+  
+
+
+  
+  // async function generateAccessToken() {
+  //    const auth = new GoogleAuth({
+  //     credentials: ServiceAccount,
+  //     scopes: ['https://www.googleapis.com/auth/firebase.messaging'],
+
+
+  //    })
+
+  //    const accessToken = await auth.getAccessToken();
+  //   //  console.log('Bearer Token:', accessToken);
+  //  }
+
+  //  generateAccessToken();
+   
+   
+  //  async function sendPushNotification(fcmToken) {
+  //   // Get your access token from the previous function
+  //   const accessToken = await generateAccessToken(); 
+  
+  //   // Define the message payload
+  //   const message = {
+  //     message: {
+  //       token: fcmToken, // The FCM Token you received
+  //       notification: {
+  //         title: "New Notification",
+  //         body: "This is the body of the push notification"
+  //       },
+  //       data: {
+  //         customData: "additional info"
+  //       }
+  //     }
+  //   };
+  
+  //   // Send the HTTP POST request to the FCM API
+  //   const response = await axios.post('https://fcm.googleapis.com/v1/projects/messagingtesto/messages:send', {
+    
+  //     headers: {
+  //       'Authorization': `Bearer ${accessToken}`, // Pass the Bearer token in the header
+  //       'Content-Type': 'application/json', // Set the content type to JSON
+  //     },
+  //     body: JSON.stringify(message), // Pass the message payload as the body
+  //   });
+  
+  //   // Handle the response
+  //   if (response.ok) {
+  //     const data = await response.json();
+  //     console.log('Successfully sent notification:', data);
+  //   } else {
+  //     const error = await response.json();
+  //     console.error('Error sending notification:', error);
+  //   }
+  // }
+  
+  // // Call the function with your FCM token
+  // const fcmToken = 'fxZDI4npSSObY4OscOsxtD:APA91bEwM-lKNjhdaDF82Az29NVrtll9OyaPm6jJkd0NqO1VYE_7OH-6ydxsNzoi9F9sfu6mgMA2qKIJXmukgFjJJhb3836a-iy7JMuR-t6aUxE3vXi48zo'; 
+  // sendPushNotification(fcmToken);
+
 
 
 
@@ -105,9 +168,6 @@ app.use(UserFirstRoute)
 app.use(NotsEndP)
 
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
 
 app.get('/api/reverse-geocode', async (req, res) => {
   const { latitude, longitude } = req.query;
