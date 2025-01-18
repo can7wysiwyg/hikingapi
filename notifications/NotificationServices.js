@@ -2,7 +2,7 @@ const admin = require('firebase-admin');
 const User = require('../models/UserModel');
 
 const axios = require('axios');
-const { generateAccessToken } = require('./authService'); // You should have this utility to generate a token for FCM
+const  generateAccessToken  = require('./authService'); // You should have this utility to generate a token for FCM
 
 // Firebase Cloud Messaging (FCM) function to send notifications
 class NotificationService {

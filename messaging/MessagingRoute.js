@@ -22,9 +22,9 @@ MessagingRoute.post('/send_message', verify, asyncHandler(async (req, res) => {
       User.findById(receiverId)
     ]);
 
-    if (!conversation) return res.status(404).json({ msg: 'Conversation not found.' });
-    if (!sender) return res.status(404).json({ msg: 'Sender not found.' });
-    if (!receiver) return res.status(404).json({ msg: 'Receiver not found.' });
+    if (!conversation) return res.json({ msg: 'Conversation not found.' });
+    if (!sender) return res.json({ msg: 'Sender not found.' });
+    if (!receiver) return res.json({ msg: 'Receiver not found.' });
 
     const newMessage = {
       receiver: receiverId,
@@ -75,7 +75,7 @@ MessagingRoute.post('/send_message', verify, asyncHandler(async (req, res) => {
 
   } catch (error) {
     console.error('Error in send_message:', error);
-    res.status(500).json({ msg: `There was an error: ${error.message}` });
+    res.json({ msg: `There was an error: ${error.message}` });
   }
 }));
 
