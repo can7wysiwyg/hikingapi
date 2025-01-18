@@ -12,10 +12,19 @@ class NotificationService {
             //     throw new Error('Receiver does not have an FCM token');
             // }
 
+
+            console.log('Receiver ID:', receiver);
+
+            if (!receiver || typeof receiver !== 'string' || receiver.trim() === '') {
+                console.log('Invalid receiver: Must be a non-empty string');
+            }
+            
+
+
             const userFind = await User.findOne({_id: receiver})
 
-            console.log(receiver)
 
+           
 
 
             const receiverFCMToken = userFind.fcmToken;
