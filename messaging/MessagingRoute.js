@@ -33,6 +33,8 @@ MessagingRoute.post('/send_message', verify, asyncHandler(async (req, res) => {
           notificationStatus: 'pending'
       };
 
+      console.log("new message", newMessage)
+
       // Update conversation with the new message
       conversation.messages.push(newMessage);
       conversation.lastMessage = content;
@@ -62,6 +64,8 @@ MessagingRoute.post('/send_message', verify, asyncHandler(async (req, res) => {
           conversationId,
           messageId: newMessage._id
       };
+
+      console.log(notificationData)
 
       res.json({
           msg: 'Message sent successfully.',
