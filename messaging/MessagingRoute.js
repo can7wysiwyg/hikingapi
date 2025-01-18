@@ -3,6 +3,7 @@ const asyncHandler = require("express-async-handler");
 const verify = require("../middleware/verify");
 const Conversation = require('../models/MessageModel')
 const NotificationService = require('../notifications/NotificationServices')
+const User = require('../models/UserModel')
 
 
 
