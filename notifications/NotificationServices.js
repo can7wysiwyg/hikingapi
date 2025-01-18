@@ -14,6 +14,8 @@ class NotificationService {
 
             const userFind = await User.findOne({_id: receiver})
 
+            console.log(receiver)
+
 
 
             const receiverFCMToken = userFind.fcmToken;
