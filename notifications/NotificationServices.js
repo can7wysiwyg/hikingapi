@@ -95,7 +95,7 @@ const axios = require('axios');
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {
     admin.initializeApp({
-        credential: admin.credential.cert(require('../firebase-service-key.json')),
+        credential: admin.credential.cert(require('../firbase-service-key.json')),
     });
 }
 
