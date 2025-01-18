@@ -14,8 +14,7 @@ class NotificationService {
 
 
             const receiverId = receiver._id.toString(); // Ensure it's a string
-            console.log('Extracted Receiver ID:', receiverId);
-
+            
             // Find receiver details in the database
             const userFind = await User.findOne({ _id: receiverId });
             if (!userFind) {
