@@ -13,16 +13,14 @@ class NotificationService {
             // }
 
 
-            console.log('Receiver ID:', receiver);
+            const receiverId = receiver._id.toString(); // Ensure it's a string
+            console.log('Extracted Receiver ID:', receiverId);
 
-            if (!receiver || typeof receiver !== 'string' || receiver.trim() === '') {
-                console.log('Invalid receiver: Must be a non-empty string');
+            // Find receiver details in the database
+            const userFind = await User.findOne({ _id: receiverId });
+            if (!userFind) {
+                throw new Error('Receiver not found in the database');
             }
-            
-
-
-            const userFind = await User.findOne({_id: receiver})
-
 
            
 
@@ -61,7 +59,7 @@ class NotificationService {
             }
 
             // Get the access token for the FCM request
-            const userId = receiver
+            const userId = receiverId
             const token = await generateAccessToken(userId);
 
             // Send the notification request to FCM
