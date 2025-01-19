@@ -23,7 +23,7 @@ class NotificationService {
                 message: {
                     token: receiverFCMToken,
                     notification: {
-                        title: `Message from ${sender}`,
+                        title: `Message from ${sender?.fullname}`,
                         body: content.substring(0, 100), // Truncate content if needed
                     },
                     data: {
