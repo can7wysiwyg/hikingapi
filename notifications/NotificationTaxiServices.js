@@ -1,3 +1,9 @@
+const { GoogleAuth } = require('google-auth-library');
+const ServiceAccount = require('../firbase-service-key.json');
+const axios = require('axios');
+const User = require('../models/UserModel');
+
+
 class NotificationTaxiServices {
     static async sendTaxiNotification(receiverId, senderName, rideDetails, type = 'non-shared') {
         try {
@@ -68,3 +74,6 @@ class NotificationTaxiServices {
         }
     }
 }
+
+
+module.exports = NotificationTaxiServices
