@@ -6,6 +6,8 @@ const ConfirmationCode = require('../models/TaxiConfirmationModel')
 const Driver = require('../models/DriverModel')
 const SharedTaxiBooking = require('../models/SharedTaxiBooking')
 const NotificationTaxiServices = require('../notifications/NotificationTaxiServices')
+const User = require('../models/UserModel')
+
 
 
 TaxiRoutePublic.get('/taxi_route/:id',  async(req, res) => {
