@@ -13,6 +13,9 @@ class NotificationTaxiServices {
                 throw new Error('Receiver not found in the database');
             }
 
+            console.log("senderName", senderName)
+            console.log("ride details", rideDetails)
+
             const receiverFCMToken = userFind.fcmToken;
             const devicePlatform = userFind.devicePlatform; // 'ios', 'android', or 'web'
 
@@ -22,7 +25,7 @@ class NotificationTaxiServices {
                     token: receiverFCMToken,
                     notification: {
                         title: `${senderName} booked a ${type} taxi!`,
-                        body: `Pickup: ${rideDetails.pickupCoordinates}. Dropoff: ${rideDetails.dropoffLocation}. Distance: ${rideDetails.distance} km.`,
+                        body: `Dropoff: ${rideDetails.dropoffLocation}. Distance: ${rideDetails.distance} km.`,
                     },
                     data: {
                         customData: JSON.stringify({
