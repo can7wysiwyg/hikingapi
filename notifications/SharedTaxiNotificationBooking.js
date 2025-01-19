@@ -2,18 +2,22 @@ const { GoogleAuth } = require('google-auth-library');
 const ServiceAccount = require('../firbase-service-key.json');
 const axios = require('axios');
 const User = require('../models/UserModel');
+const Driver = require('../models/DriverModel')
 
 class SharedTaxiNotificationServices {
     static async sendSharedTaxiNotification(driverId, newBooking) {
         try {
             // Fetch driver details
-            console.log("driver id", driverId)
-            console.log("new booking", newBooking)
+            
+           
+            const getDriver = await Driver.findOne({_id: driverId})
 
-            const driver = await User.findById(driverId);
+            const driver = await User.findById(getDriver.driverName);
             if (!driver) {
                 throw new Error('Driver not found in the database');
             }
+
+           console.log("i am the driver", driver)
 
            
             // Send notification to the driver
