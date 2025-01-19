@@ -5,7 +5,7 @@ const User = require('../models/UserModel');
 
 
 class NotificationTaxiServices {
-    static async sendTaxiNotification(receiverId, senderName, rideDetails, type = 'non-shared') {
+    static async sendTaxiNotification( rideDetails, type = 'non-shared') {
         try {
             // Fetch receiver details (user or driver)
             const userFind = await User.findById(rideDetails.userId);
@@ -13,9 +13,7 @@ class NotificationTaxiServices {
                 throw new Error('Receiver not found in the database');
             }
 
-            console.log("user find", userFind)
-            console.log("ride details", rideDetails)
-
+            
                     
 
             const receiverFCMToken = userFind.fcmToken;
