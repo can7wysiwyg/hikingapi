@@ -7,14 +7,15 @@ class SharedTaxiNotificationServices {
     static async sendSharedTaxiNotification(driverId, newBooking) {
         try {
             // Fetch driver details
+            console.log("driver id", driverId)
+            console.log("new booking", newBooking)
+
             const driver = await User.findById(driverId);
             if (!driver) {
                 throw new Error('Driver not found in the database');
             }
 
-            console.log("driver id", driverId)
-            console.log("new booking", newBooking)
-
+           
             // Send notification to the driver
             const driverFCMToken = driver.fcmToken;
             const notificationPayloadDriver = {
