@@ -127,6 +127,24 @@ MessagingRoute.post('/start_conversation', verify, asyncHandler(async(req, res) 
 
 
 
+MessagingRoute.get('/get_my_messages/:id',  asyncHandler(async(req, res) => {
+
+
+  try {
+
+    const {id} = req.params
+
+    const convo = await Conversation.findById(id)
+
+    res.json({convo})
+    
+  } catch (error) {
+    res.json({msg: `there was an error: ${error.message}`})
+        
+    
+  }
+
+}))
 
 
 
