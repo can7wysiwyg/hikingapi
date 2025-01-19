@@ -8,13 +8,15 @@ class NotificationTaxiServices {
     static async sendTaxiNotification(receiverId, senderName, rideDetails, type = 'non-shared') {
         try {
             // Fetch receiver details (user or driver)
-            const userFind = await User.findOne({ _id: receiverId });
+            const userFind = await User.findById(rideDetails.userId);
             if (!userFind) {
                 throw new Error('Receiver not found in the database');
             }
 
-            console.log("senderName", senderName)
+            console.log("user find", userFind)
             console.log("ride details", rideDetails)
+
+                    
 
             const receiverFCMToken = userFind.fcmToken;
             const devicePlatform = userFind.devicePlatform; // 'ios', 'android', or 'web'
@@ -24,7 +26,7 @@ class NotificationTaxiServices {
                 message: {
                     token: receiverFCMToken,
                     notification: {
-                        title: `${senderName} booked a ${type} taxi!`,
+                        title: `${userFind.fullname} booked a ${type} taxi!`,
                         body: `Dropoff: ${rideDetails.dropoffLocation}. Distance: ${rideDetails.distance} km.`,
                     },
                     data: {
