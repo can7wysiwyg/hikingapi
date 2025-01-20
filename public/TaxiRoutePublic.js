@@ -529,7 +529,7 @@ TaxiRoutePublic.delete('/erase_non_shared_from_booking_page/:id', verify, async(
 
     await Ride.findByIdAndDelete(singleUserRide._id)
 
-    res.json({msg: "deleted successfully!!"})
+    res.json({msg: "cancelled successfully!!"})
 
     
   } catch (error) {
