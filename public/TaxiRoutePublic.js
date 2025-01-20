@@ -249,13 +249,7 @@ TaxiRoutePublic.post('/book_non_shared_taxi', verify, async (req, res) => {
           );
       }
 
-      await NotificationTaxiServices.sendTaxiNotification(
-          driverId,
-          user.fullname, // Sender name
-          savedRide,
-          'non-shared'
-      );
-
+     
       // Return success response
       return res.status(201).json({
           success: true,
