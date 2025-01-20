@@ -238,6 +238,9 @@ TaxiRoutePublic.post('/book_non_shared_taxi', verify, async (req, res) => {
 
       // Send notifications
       const user = await User.findById(userId);
+      console.log("user id", userId)
+      console.log("saved ride", savedRide)
+
       if (user) {
           await NotificationTaxiServices.sendTaxiNotification(
               userId,
