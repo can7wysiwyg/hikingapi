@@ -513,8 +513,30 @@ TaxiRoutePublic.delete('/cancel_requested_ride/:id', verify, async(req, res) => 
 
     
   } catch (error) {
-    res.status(500).json({ msg: `An unexpected error occurred while  deleting route: ${error}` });
+    res.json({ msg: `An unexpected error occurred while  deleting route: ${error}` });
   }
+
+})
+
+
+TaxiRoutePublic.delete('/erase_non_shared_from_booking_page/:id', verify, async(req, res) => {
+
+  try {
+
+    const {id} = req.params
+
+    const  singleUserRide = await Ride.findOne({userId: id})
+
+    await Ride.findByIdAndDelete(singleUserRide._id)
+
+    res.json({msg: "deleted successfully!!"})
+
+    
+  } catch (error) {
+    res.json({ msg: `An unexpected error occurred while  deleting route: ${error}` });
+    
+  }
+
 
 })
   
