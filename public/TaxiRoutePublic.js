@@ -485,7 +485,7 @@ try {
 });
 
 
-TaxiRoute.get('/user_ride_show/:id', verify, async(req, res) => {
+TaxiRoutePublic.get('/user_ride_show/:id', verify, async(req, res) => {
 
   try {
     const {id} = req.params
