@@ -17,7 +17,7 @@ class SharedTaxiNotificationServices {
                 throw new Error('Driver not found in the database');
             }
 
-           console.log("i am the driver", driver)
+        
 
            
             // Send notification to the driver

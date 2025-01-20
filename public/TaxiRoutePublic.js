@@ -109,68 +109,6 @@ const destMaxDistance = 300; // 300 meters
 };
 
 
-// TaxiRoutePublic.post('/book_taxi', verify, async (req, res) => {
-//   try {
-//       const { userId, driverId, pickUpLocation, dropoff } = req.body;
-
-//       // Validate required fields
-//       if (!userId || !driverId || !pickUpLocation || !dropoff) {
-//           return res.status(400).json({ msg: "Fields cannot be empty" });
-//       }
-
-//       // Fetch driver details to confirm taxi type
-//       const driver = await Driver.findById(driverId);
-//       if (!driver) {
-//           return res.status(404).json({ msg: "Driver not found" });
-//       }
-
-//       // Ensure the driver is for a shared taxi
-//       if (driver.taxiType !== 'shared') {
-//           return res.status(400).json({ msg: "Only shared taxis are supported" });
-//       }
-
-//       const sharedTaxiCapacity = parseInt(driver.driverCarCapacity, 10);
-
-//       // Fetch or create a shared taxi entry in SharedTaxiBooking model
-//       let sharedTaxiBooking = await SharedTaxiBooking.findOne({ driverId });
-//       if (!sharedTaxiBooking) {
-//           sharedTaxiBooking = new SharedTaxiBooking({
-//               driverId,
-//               taxiCapacity: sharedTaxiCapacity,
-//               bookings: [], // Initialize an empty array for confirmation codes
-//           });
-//       }
-
-//       // Check if the taxi has reached its capacity
-//       if (sharedTaxiBooking.bookings.length >= sharedTaxiCapacity) {
-//           return res.status(400).json({ msg: "Taxi is fully booked" });
-//       }
-
-//       // Generate a unique confirmation code
-//       const confirmationCode = generateConfirmationCode();
-
-//       // Add the new booking to the shared taxi's confirmation codes array
-//       sharedTaxiBooking.bookings.push({
-//           confirmationCode,
-//           userId,
-//           pickUpLocation,
-//           dropoff,
-//       });
-
-//       await sharedTaxiBooking.save();
-
-//       return res.status(201).json({
-//           success: true,
-//           message: 'Shared taxi booked successfully!',
-//           confirmationCode,
-//           currentOccupancy: sharedTaxiBooking.bookings.length,
-//           maxCapacity: sharedTaxiCapacity,
-//       });
-//   } catch (error) {
-//       console.error('Error booking shared taxi:', error);
-//       res.status(500).json({ success: false, message: error.message });
-//   }
-// });
 
 
 TaxiRoutePublic.post('/book_taxi', verify, async (req, res) => {
@@ -542,9 +480,25 @@ try {
         });
     } catch (error) {
         console.error('Error fetching rides:', error);
-        res.status(500).json({ message: 'An unexpected error occurred while fetching rides.' });
+        res.json({ message: 'An unexpected error occurred while fetching rides.' });
     }
 });
+
+
+TaxiRoute.get('/user_ride_show/:id', verify, async(req, res) => {
+
+  try {
+    const {id} = req.params
+
+    const singleUserRide = await Ride.findOne({userId: id})
+
+    res.json({singleUserRide})
+    
+  } catch (error) {
+    res.json({msg: `there was an error while fethcing the ride, error: ${error}`})
+  }
+
+})
 
 
 

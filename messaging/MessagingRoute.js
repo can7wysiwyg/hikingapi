@@ -34,7 +34,7 @@ MessagingRoute.post('/send_message', verify, asyncHandler(async (req, res) => {
       notificationStatus: 'pending'
     };
 
-    console.log('new message', newMessage)
+    
 
     // Update conversation with the new message
     conversation.messages.push(newMessage);
@@ -65,7 +65,7 @@ MessagingRoute.post('/send_message', verify, asyncHandler(async (req, res) => {
       messageId: newMessage._id
     };
 
-    console.log('notifcation data', notificationData)
+  
 
     res.json({
       msg: 'Message sent successfully.',
@@ -74,7 +74,7 @@ MessagingRoute.post('/send_message', verify, asyncHandler(async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in send_message:', error);
+  
     res.json({ msg: `There was an error: ${error.message}` });
   }
 }));
