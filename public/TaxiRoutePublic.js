@@ -243,8 +243,7 @@ TaxiRoutePublic.post('/book_non_shared_taxi', verify, async (req, res) => {
 
       if (user) {
           await NotificationTaxiServices.sendTaxiNotification(
-              userId,
-              driver.name, // Sender name
+              
               savedRide,
               'non-shared'
           );
