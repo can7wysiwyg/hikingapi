@@ -26,9 +26,6 @@ const DriverLocationRoute = require('./driverRoutes/DriverLocationRoute')
 const NearbyTaxisRoute = require('./public/NearbyTaxisRoute')
 const UserFirstRoute = require('./userRoutes/UserFirstRoute')
 const NotsEndP = require('./notifications/NotsEndP')
-// const { GoogleAuth } = require('google-auth-library')
-// const ServiceAccount = require('./firbase-service-key.json')
-
 
 
 
@@ -39,102 +36,22 @@ const db = mongoose.connection
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', function(){
     console.log("connected to database");
+  try {
+    db.collection('drivers')
+    db.collection('taxiroutes')
+
+    
+  } catch (error) {
+    console.error('Error checking indexes:', error);
+    
+  }
+
+
   });
 
 
 
   
-
-
-  
-  // async function generateAccessToken() {
-  //    const auth = new GoogleAuth({
-  //     credentials: ServiceAccount,
-  //     scopes: ['https://www.googleapis.com/auth/firebase.messaging'],
-
-
-  //    })
-
-  //    const accessToken = await auth.getAccessToken();
-  //   //  console.log('Bearer Token:', accessToken);
-  //  }
-
-  //  generateAccessToken();
-   
-   
-  //  async function sendPushNotification(fcmToken) {
-  //   // Get your access token from the previous function
-  //   const accessToken = await generateAccessToken(); 
-  
-  //   // Define the message payload
-  //   const message = {
-  //     message: {
-  //       token: fcmToken, // The FCM Token you received
-  //       notification: {
-  //         title: "New Notification",
-  //         body: "This is the body of the push notification"
-  //       },
-  //       data: {
-  //         customData: "additional info"
-  //       }
-  //     }
-  //   };
-  
-  //   // Send the HTTP POST request to the FCM API
-  //   const response = await axios.post('https://fcm.googleapis.com/v1/projects/messagingtesto/messages:send', {
-    
-  //     headers: {
-  //       'Authorization': `Bearer ${accessToken}`, // Pass the Bearer token in the header
-  //       'Content-Type': 'application/json', // Set the content type to JSON
-  //     },
-  //     body: JSON.stringify(message), // Pass the message payload as the body
-  //   });
-  
-  //   // Handle the response
-  //   if (response.ok) {
-  //     const data = await response.json();
-  //     console.log('Successfully sent notification:', data);
-  //   } else {
-  //     const error = await response.json();
-  //     console.error('Error sending notification:', error);
-  //   }
-  // }
-  
-  // // Call the function with your FCM token
-  // const fcmToken = 'fxZDI4npSSObY4OscOsxtD:APA91bEwM-lKNjhdaDF82Az29NVrtll9OyaPm6jJkd0NqO1VYE_7OH-6ydxsNzoi9F9sfu6mgMA2qKIJXmukgFjJJhb3836a-iy7JMuR-t6aUxE3vXi48zo'; 
-  // sendPushNotification(fcmToken);
-
-
-
-
-// mongoose.connect(process.env.MONGOURL, { useNewUrlParser: true, useUnifiedTopology: true });
-
-// const db = mongoose.connection;
-
-// // Handle connection errors
-// db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-
-// // Once connected, check the indexes
-// db.once('open', async function () {
-//   console.log('Connected to database');
-
-//   try {
-//     // Get the native MongoDB driver collection
-//     const collection = db.collection('drivers'); // Replace 'taxiRoutes' with your collection name
-
-//     // List indexes
-//     const indexes = await collection.indexes();
-
-//     // Log the indexes
-//     console.log('Indexes:', indexes);
-//   } catch (err) {
-//     console.error('Error checking indexes:', err);
-//   } finally {
-//     // Close the connection
-//     mongoose.connection.close();
-//   }
-// });
-
 
 
 

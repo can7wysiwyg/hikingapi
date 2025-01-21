@@ -533,7 +533,7 @@ TaxiRoutePublic.delete('/erase_non_shared_from_booking_page/:id', verify, async(
 
     
   } catch (error) {
-    res.json({ msg: `An unexpected error occurred while  deleting route: ${error}` });
+    res.json({ msg: `something: ${error}` });
     
   }
 
