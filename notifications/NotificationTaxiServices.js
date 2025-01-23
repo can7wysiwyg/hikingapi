@@ -10,11 +10,16 @@ class NotificationTaxiServices {
         try {
             // Fetch receiver details (user or driver)
               const getDriver = await Driver.findOne({_id: driverId})
+
+            
             
             const userFind = await User.findById(getDriver.driverName);
             if (!userFind) {
                 throw new Error('Receiver not found in the database');
             }
+
+
+            console.log("i am the user", userFind._id)
 
            
                     
