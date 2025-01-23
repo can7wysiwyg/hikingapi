@@ -9,7 +9,7 @@ class NotificationTaxiServices {
     static async sendTaxiNotification( rideDetails, type = 'non-shared') {
         try {
             // Fetch receiver details (user or driver)
-              const getDriver = await Driver.findOne({_id: driverId})
+              const getDriver = await Driver.findOne({_id: rideDetails.driverId})
 
             
             
