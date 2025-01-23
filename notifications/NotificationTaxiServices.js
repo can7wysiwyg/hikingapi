@@ -18,9 +18,10 @@ class NotificationTaxiServices {
                 throw new Error('Receiver not found in the database');
             }
 
+            const getTaxiBooker = await User.findById(rideDetails.userId)
 
-            console.log("i am the user", userFind._id)
 
+           
            
                     
 
@@ -32,7 +33,7 @@ class NotificationTaxiServices {
                 message: {
                     token: receiverFCMToken,
                     notification: {
-                        title: `${userFind.fullname} booked a ${type} taxi!`,
+                        title: `${getTaxiBooker.fullname} booked Your ${type} taxi!`,
                         body: `Dropoff: ${rideDetails.dropoffLocation}. Distance: ${rideDetails.distance} km.`,
                     },
                     data: {
