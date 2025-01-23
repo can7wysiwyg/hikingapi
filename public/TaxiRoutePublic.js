@@ -233,6 +233,8 @@ TaxiRoutePublic.post('/book_non_shared_taxi', verify, async (req, res) => {
           confirmationCode,
           rideStatus: 'requested', // Initial ride status
       });
+      const user = await User.findById(userId);
+
 
       const savedRide = await newRide.save();
 
