@@ -20,6 +20,30 @@ class NotificationTaxiServices {
 
             const getTaxiBooker = await User.findById(rideDetails.userId)
 
+            // get pickup location
+
+            const  addressName = await axios.get('https://nominatim.openstreetmap.org/reverse', {
+                params: {
+                  lat: rideDetails.pickupCoordinates.latitude,        // Latitude
+                  lon: rideDetails.pickupCoordinates.longitude,       // Longitude
+                  format: 'json',       // Response format
+                  addressdetails: 1,    // Include address details
+                },
+                headers: {
+                  'User-Agent': 'YourAppName', // Set a User-Agent to identify your app
+                },
+              });
+
+             const data = addressName.data.address
+
+
+
+
+console.log("here is my address..", data)
+
+
+
+
 
            
            
