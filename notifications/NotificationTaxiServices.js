@@ -22,17 +22,21 @@ class NotificationTaxiServices {
 
             // get pickup location
 
-            const  addressName = await axios.get('https://nominatim.openstreetmap.org/reverse', {
-                params: {
-                  lat: rideDetails.pickupCoordinates.latitude,        // Latitude
-                  lon: rideDetails.pickupCoordinates.longitude,       // Longitude
-                  format: 'json',       // Response format
-                  addressdetails: 1,    // Include address details
-                },
-                headers: {
-                  'User-Agent': 'YourAppName', // Set a User-Agent to identify your app
-                },
-              });
+            // const  addressName = await axios.get('https://nominatim.openstreetmap.org/reverse', {
+            //     params: {
+            //       lat: rideDetails.pickupCoordinates.latitude,        // Latitude
+            //       lon: rideDetails.pickupCoordinates.longitude,       // Longitude
+            //       format: 'json',       // Response format
+            //       addressdetails: 1,    // Include address details
+            //     },
+            //     headers: {
+            //       'User-Agent': 'YourAppName', // Set a User-Agent to identify your app
+            //     },
+            //   });
+   
+            const apiKey = '9c9c94ac-7c45-4141-8427-663723d70743';
+
+         const addressName = await axios.get(`https://graphhopper.com/api/1/geocode?point=${rideDetails.pickupCoordinates.latitude},${rideDetails.pickupCoordinates.longitude}&reverse=true&key=${apiKey}`)   
 
              const data = addressName.data.address
 
