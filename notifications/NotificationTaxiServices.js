@@ -13,7 +13,7 @@ class NotificationTaxiServices {
                 throw new Error('Receiver not found in the database');
             }
 
-            
+            console.log(userFind._id)
                     
 
             const receiverFCMToken = userFind.fcmToken;
