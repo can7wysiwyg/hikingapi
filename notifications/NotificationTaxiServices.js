@@ -8,12 +8,12 @@ class NotificationTaxiServices {
     static async sendTaxiNotification( rideDetails, type = 'non-shared') {
         try {
             // Fetch receiver details (user or driver)
-            const userFind = await User.findById(rideDetails.userId);
+            const userFind = await User.findById(rideDetails.driverId);
             if (!userFind) {
                 throw new Error('Receiver not found in the database');
             }
 
-            console.log(userFind._id)
+            console.log("this is the driver id", userFind._id)
                     
 
             const receiverFCMToken = userFind.fcmToken;
