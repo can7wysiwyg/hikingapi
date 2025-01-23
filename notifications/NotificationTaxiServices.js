@@ -38,7 +38,8 @@ class NotificationTaxiServices {
 
          const addressName = await axios.get(`https://graphhopper.com/api/1/geocode?point=${rideDetails.pickupCoordinates.latitude},${rideDetails.pickupCoordinates.longitude}&reverse=true&key=${apiKey}`)   
 
-             const data = addressName.data.address
+             const data = addressName.data.hits[0];
+
 
 
 
