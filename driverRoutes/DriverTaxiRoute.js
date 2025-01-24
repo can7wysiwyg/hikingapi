@@ -221,7 +221,7 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
 
   // driver update route
 
-  DriverTaxiRoute.put('/driver_route_name_update/:id', verify, verifyDriver, async(req, res) => {
+  DriverTaxiRoute.put('/driver_route_update/:id', verify, verifyDriver, async(req, res) => {
     try {
       const {id} = req.params
   
@@ -251,10 +251,10 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
         {new: true}
       )
   
-      res.json({msg: "Route Name has been successfully updated", route: updatedRoute})
+      res.json({msg: "successfully updated", route: updatedRoute})
   
     } catch (error) {
-      res.status(500).json({msg: `Problem updating route name: ${error.message}`})
+      res.status(500).json({msg: `Problem updating: ${error.message}`})
     }
   })
   
