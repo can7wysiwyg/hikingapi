@@ -240,18 +240,18 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
       console.log("find driver", findDriver)
       console.log("req user", req.user.id)
 
-      // Ensure the current user is the route's owner
-      // if(findDriver._id.toString() !== req.user.id) {
-      //   return res.status(403).json({msg: "Unauthorized to update this route"})
-      // }
+    
+      if(findDriver.driverName.toString() !== req.user.id) {
+        return res.status(403).json({msg: "Unauthorized to update this route"})
+      }
   
-      // const updatedRoute = await TaxiRoute.findByIdAndUpdate(
-      //   id, 
-      //   req.body, 
-      //   {new: true}
-      // )
+      const updatedRoute = await TaxiRoute.findByIdAndUpdate(
+        id, 
+        req.body, 
+        {new: true}
+      )
   
-      // res.json({msg: "Route Name has been successfully updated", route: updatedRoute})
+      res.json({msg: "Route Name has been successfully updated", route: updatedRoute})
   
     } catch (error) {
       res.status(500).json({msg: `Problem updating route name: ${error.message}`})
