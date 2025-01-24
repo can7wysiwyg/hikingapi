@@ -217,7 +217,45 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
       res.status(500).json({ msg: `There was an error: ${error.message}` });
     }
   });
+
+
+  // driver update route
+
+  DriverTaxiRoute.put('/driver_route_name_update/:id', verify, verifyDriver, async(req, res) => {
+    try {
+      const {id} = req.params
   
+      const ownerId = await TaxiRoute.findById(id)
+      if (!ownerId) {
+        return res.status(404).json({msg: "Route not found"})
+      }
+
+      console.log("owner", ownerId)
+  
+      const findDriver = await Driver.findById(ownerId.taxiId)
+      if (!findDriver) {
+        return res.status(404).json({msg: "Driver not found"})
+      }
+
+      console.log("find driver", findDriver)
+  
+      // Ensure the current user is the route's owner
+      if(findDriver._id.toString() !== req.user.id) {
+        return res.status(403).json({msg: "Unauthorized to update this route"})
+      }
+  
+      const updatedRoute = await TaxiRoute.findByIdAndUpdate(
+        id, 
+        req.body, 
+        {new: true}
+      )
+  
+      res.json({msg: "Route Name has been successfully updated", route: updatedRoute})
+  
+    } catch (error) {
+      res.status(500).json({msg: `Problem updating route name: ${error.message}`})
+    }
+  })
   
  
   module.exports = DriverTaxiRoute
