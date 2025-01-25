@@ -369,45 +369,95 @@ TaxiRoutePublic.get('/taxi_occupancy_all',  async (req, res) => {
   });
 
 
-  TaxiRoutePublic.get('/user_booked/:driverId/:userId', verify, async (req, res) => {
+  // TaxiRoutePublic.get('/user_booked/:driverId/:userId', verify, async (req, res) => {
+  //   try {
+  //     const { driverId, userId } = req.params;
+  
+  //     // Find the taxi by driverId
+  //     const sharedTaxi = await SharedTaxiBooking.findOne({ driverId });
+  
+  //     if (!sharedTaxi) {
+  //       // No bookings exist for this taxi yet
+  //       return res.status(200).json({
+  //         msg: "No bookings exist for this taxi yet.",
+  //         userAlreadyBooked: false,
+  //       });
+  //     }
+  
+  //     // Check if the user already has a booking and get booking details if available
+  //     const userBooking = sharedTaxi.bookings.find(
+  //       (booking) => booking.userId.toString() === userId
+  //     );
+  
+  //     if (!userBooking) {
+  //       // User has no booking for this taxi
+  //       return res.status(200).json({
+  //         msg: "User has not booked this taxi.",
+  //         userAlreadyBooked: false,
+  //       });
+  //     }
+  
+  //     // User has a booking, return the booking details
+  //     return res.status(200).json({
+  //       msg: "User has already booked this taxi.",
+  //       userAlreadyBooked: true,
+  //       bookingDetails: userBooking, // Return the booking details
+  //     });
+  //   } catch (error) {
+  //     console.error("Error checking user booking:", error);
+  //     res.status(500).json({ success: false, message: error.message });
+  //   }
+  // });
+
+
+
+  TaxiRoutePublic.get("/single_user_booked/:userId",  async (req, res) => {
     try {
-      const { driverId, userId } = req.params;
+      const { userId } = req.params;
   
-      // Find the taxi by driverId
-      const sharedTaxi = await SharedTaxiBooking.findOne({ driverId });
+      // Find the shared taxi bookings that involve this user
+      const sharedTaxis = await SharedTaxiBooking.find({
+        "bookings.userId": userId,
+      });
   
-      if (!sharedTaxi) {
-        // No bookings exist for this taxi yet
+      if (sharedTaxis.length === 0) {
+        // No bookings exist for this user
         return res.status(200).json({
-          msg: "No bookings exist for this taxi yet.",
+          msg: "User has not booked any shared taxi.",
           userAlreadyBooked: false,
         });
       }
   
-      // Check if the user already has a booking and get booking details if available
-      const userBooking = sharedTaxi.bookings.find(
-        (booking) => booking.userId.toString() === userId
-      );
+      // User has bookings, return the details of their bookings
+      const userBookings = sharedTaxis.map((taxi) => {
+        const booking = taxi.bookings.find(
+          (booking) => booking.userId.toString() === userId
+        );
   
-      if (!userBooking) {
-        // User has no booking for this taxi
-        return res.status(200).json({
-          msg: "User has not booked this taxi.",
-          userAlreadyBooked: false,
-        });
-      }
+        return {
+          confirmationCode: booking.confirmationCode,
+          driverId: taxi.driverId,
+          pickUpLocation: booking.pickUpLocation,
+          dropoff: booking.dropoff,
+          _id: booking._id,
+        };
+      });
   
-      // User has a booking, return the booking details
       return res.status(200).json({
-        msg: "User has already booked this taxi.",
+        msg: "User has bookings for shared taxis.",
         userAlreadyBooked: true,
-        bookingDetails: userBooking, // Return the booking details
+        bookings: userBookings,
       });
     } catch (error) {
       console.error("Error checking user booking:", error);
-      res.status(500).json({ success: false, message: error.message });
+      res.status(500).json({
+        success: false,
+        message: "An error occurred while processing the request.",
+        error: error.message,
+      });
     }
   });
+  
   
 
 
