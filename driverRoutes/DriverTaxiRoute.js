@@ -230,16 +230,14 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
         return res.status(404).json({msg: "Route not found"})
       }
 
-      console.log("owner", ownerId)
+      
   
       const findDriver = await Driver.findById(ownerId.taxiId)
       if (!findDriver) {
         return res.status(404).json({msg: "Driver not found"})
       }
 
-      console.log("find driver", findDriver)
-      console.log("req user", req.user.id)
-
+      
     
       if(findDriver.driverName.toString() !== req.user.id) {
         return res.status(403).json({msg: "Unauthorized to update this route"})
