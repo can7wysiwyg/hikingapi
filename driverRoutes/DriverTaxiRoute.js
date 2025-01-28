@@ -51,14 +51,27 @@ DriverTaxiRoute.put(
 DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) => {
   try {
     
+      const alreadyExists = await Driver.findOne({ driverName: req.user.id });
+
+      const found = alreadyExists._id
+
+      const checkTaxi = await TaxiRoute.findOne({taxiId: found})
+
+      if(checkTaxi) {
+        return res.json({msg: "you have a route already"})
+      } 
+
+
+
+
     const { taxiId, routeName, startLocation, endLocation, fare } = req.body;
 
-    // Validate data
+    
     if (!taxiId || !routeName || !startLocation || !endLocation || !fare) {
       return res.status(400).json({ success: false, message: 'All fields are required' });
     }
 
-    // Validate that startLocation and endLocation have coordinates and placeName
+    
     if (
       !startLocation.coordinates || !Array.isArray(startLocation.coordinates.coordinates) ||
       startLocation.coordinates.coordinates.length !== 2 ||
@@ -70,7 +83,7 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
       return res.status(400).json({ success: false, message: 'Invalid location data' });
     }
 
-    // Create a new TaxiRoute document
+    
     const route = new TaxiRoute({
       taxiId,
       routeName,
@@ -82,11 +95,13 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
 
   
 
-    // Save the route
+    
     await route.save();
 
-    // Respond with success message and created route data
+    
     res.status(201).json({ success: true, message: 'Route created successfully', route });
+
+
   } catch (error) {
     console.error('Error in backend:', error);  // Log the error
     res.status(500).json({ success: false, message: 'Internal server error' });

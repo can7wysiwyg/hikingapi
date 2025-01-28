@@ -33,75 +33,7 @@ TaxiRoutePublic.get('/taxi_route/:id',  async(req, res) => {
 
     
      
-  TaxiRoutePublic.get('/show_taxis_by_coordinates', async (req, res) => {
-    try {
-      const { userLongitude, userLatitude, destLongitude, destLatitude } = req.query;
   
-      if (!userLongitude || !userLatitude || !destLongitude || !destLatitude) {
-        return res.status(400).json({ error: 'All coordinates (user and destination) are required.' });
-      }
-  
-      
-      const userMaxDistance = 800; // 200 meters
-const destMaxDistance = 300; // 300 meters
-
-      
-  
-      // Step 1: Find shared taxis near the user
-      const nearbySharedTaxis = await Driver.find({
-        taxiType: 'shared', // Only shared taxis
-        location: {
-          $near: {
-            $geometry: {
-              type: 'Point',
-              coordinates: [parseFloat(userLongitude), parseFloat(userLatitude)], // User's current location
-            },
-            $maxDistance: userMaxDistance,
-          },
-        },
-      });
-  
-      
-      // Step 2: Filter for taxis heading to the destination
-      const filteredSharedTaxis = [];
-      for (const taxi of nearbySharedTaxis) {
-        const matchingRoute = await TaxiRoute.findOne({
-          taxiId: taxi._id, // Match the taxi to its route
-          'endLocation.coordinates': {
-            $near: {
-              $geometry: {
-                type: 'Point',
-                coordinates: [parseFloat(destLongitude), parseFloat(destLatitude)], // Destination coordinates
-              },
-              $maxDistance: destMaxDistance,
-            },
-          },
-        });
-  
-        if (matchingRoute) {
-          filteredSharedTaxis.push({
-            driver: taxi,
-            route: matchingRoute,
-          });
-        }
-      }
-  
-      
-      // Return filtered taxis
-      if (!filteredSharedTaxis.length) {
-        return res.json({ sharedTaxis: [], message: 'No shared taxis match your search criteria.' });
-      }
-  
-      res.json({ sharedTaxis: filteredSharedTaxis });
-    } catch (error) {
-      console.error('Error fetching shared taxis:', error);
-      res.status(500).json({ error: `Internal server error: ${error.message}` });
-    }
-  });
-  
-
-  
-
 
   const generateConfirmationCode = () => {
     // Generate a random 6-character alphanumeric confirmation code
@@ -425,6 +357,8 @@ TaxiRoutePublic.get('/taxi_occupancy_all',  async (req, res) => {
   TaxiRoutePublic.put('/cancel_shared_taxi_order/:driverId/:userId', verify, async (req, res) => {
     try {
       const { driverId, userId } = req.params;
+
+    
   
       // Find the shared taxi by driverId
       const sharedTaxi = await SharedTaxiBooking.findOne({ driverId });
