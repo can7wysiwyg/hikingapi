@@ -1,9 +1,9 @@
 const AdminAuthRoute = require('express').Router()
 const bcrypt = require('bcrypt')
 const jwt = require("jsonwebtoken");
+const asyncHandler = require('express-async-handler')
 const MainAdmin = require('../models/MainAdmin')
 const verifyMainAdmin = require('../adminmiddleware/verifyMainAdmin')
-const mainAdmin = require('../adminmiddleware/mainAdmin')
 
 
 AdminAuthRoute.post('/admin_register', asyncHandler(async(req, res, next) => {
@@ -115,7 +115,7 @@ const createAccessToken = (admin) =>{
         return jwt.sign(admin, process.env.ACCESS_TOKEN_MAIN_ADMIN, {expiresIn: '14d'})
       }
 
-      
+
 const createRefreshToken = (admin) =>{
         return jwt.sign(admin, process.env.REFRESH_TOKEN_MAIN_ADMIN, {expiresIn: '14d'})
       }
