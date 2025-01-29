@@ -26,6 +26,7 @@ const DriverLocationRoute = require('./driverRoutes/DriverLocationRoute')
 const NearbyTaxisRoute = require('./public/NearbyTaxisRoute')
 const UserFirstRoute = require('./userRoutes/UserFirstRoute')
 const NotsEndP = require('./notifications/NotsEndP')
+const AdminAuthRoute = require('./adminRoutes/AdminAuthRoute')
 
 
 
@@ -83,6 +84,7 @@ app.use(DriverLocationRoute)
 app.use(NearbyTaxisRoute)
 app.use(UserFirstRoute)
 app.use(NotsEndP)
+app.use(AdminAuthRoute)
 
 
 
