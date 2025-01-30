@@ -1,46 +1,81 @@
-const AdminUsersRoute = require('express').Router()
-const User = require('../models/UserModel')
-const verifyMainAdmin = require('../adminmiddleware/verifyMainAdmin')
-const mainAdmin = require('../adminmiddleware/mainAdmin')
-const asyncHandler = require('express-async-handler')
+const AdminUsersRoute = require("express").Router();
+const User = require("../models/UserModel");
+const Driver = require("../models/DriverModel");
+const verifyMainAdmin = require("../adminmiddleware/verifyMainAdmin");
+const mainAdmin = require("../adminmiddleware/mainAdmin");
+const asyncHandler = require("express-async-handler");
 
-AdminUsersRoute.get('/admin_show_all_users', verifyMainAdmin, mainAdmin,  asyncHandler(async (req, res) => {
+AdminUsersRoute.get(
+  "/admin_show_all_users",
+  verifyMainAdmin,
+  mainAdmin,
+  asyncHandler(async (req, res) => {
     try {
-      
-      const users = await User.find().sort({_id: -1})
-  
-      res.json(users); 
+      const users = await User.find().sort({ _id: -1 });
+
+      res.json(users);
     } catch (error) {
-      res.status(500).json({ msg: `There was an error in getting the users: ${error.message}` });
+      res.status(500).json({
+        msg: `There was an error in getting the users: ${error.message}`,
+      });
     }
-  }));
+  })
+);
+
+AdminUsersRoute.get(
+  "/admin_show_user/:id",
+  verifyMainAdmin,
+  mainAdmin,
+  asyncHandler(async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const user = await User.findOne({ _id: id });
+
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({
+        msg: `There was an error in getting the users: ${error.message}`,
+      });
+    }
+  })
+);
+
+AdminUsersRoute.put(
+  "/admin_change_user_account/:id",
+  verifyMainAdmin,
+  mainAdmin,
+  asyncHandler(async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      await User.findByIdAndUpdate(id, req.body, { new: true });
+
+      res.json({ msg: "action has been successful" });
+    } catch (error) {
+      res.json({ msg: `problem in changing user account` });
+    }
+  })
+);
+
+AdminUsersRoute.get(
+  "/admin_view_driver_application/:id",
+  verifyMainAdmin,
+  mainAdmin,
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    const driver = await Driver.findOne({ driverName: id });
 
 
-  AdminUsersRoute.get('/admin_show_user/:id', verifyMainAdmin, mainAdmin, asyncHandler(async(req, res) => {
+    if (!driver) {
+      return res.json({ msg: "USER HAS NO DRIVER APPLICATION" });
+    }
 
-try {
-
-  const {id} = req.params
-
-  const user = await User.findOne({_id: id})
-
-
-  res.json(user)
 
   
+    res.json(driver);
+  })
+);
 
-  
-} catch (error) {
-
-  res.status(500).json({ msg: `There was an error in getting the users: ${error.message}` });
-  
-}
-
-  }) )
-
-
-
-
-
-
-module.exports = AdminUsersRoute
+module.exports = AdminUsersRoute;
