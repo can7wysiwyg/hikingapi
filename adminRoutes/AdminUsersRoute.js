@@ -4,8 +4,7 @@ const Driver = require("../models/DriverModel");
 const verifyMainAdmin = require("../adminmiddleware/verifyMainAdmin");
 const mainAdmin = require("../adminmiddleware/mainAdmin");
 const asyncHandler = require("express-async-handler");
-const nodemailer = require('nodemailer')
-
+const nodemailer = require("nodemailer");
 
 AdminUsersRoute.get(
   "/admin_show_all_users",
@@ -97,51 +96,63 @@ AdminUsersRoute.put(
   })
 );
 
+AdminUsersRoute.delete(
+  "/admin_delete_application/:id",
+  verifyMainAdmin,
+  mainAdmin,
+  asyncHandler(async (req, res) => {
+    try {
+      const { id } = req.params;
 
-AdminUsersRoute.delete('/admin_delete_application/:id', verifyMainAdmin, mainAdmin, asyncHandler(async(req, res) => {
+      const user = await User.findById(id);
+      const email = user.email;
 
-  try {
-    const {id} = req.params
+      const findApp = await Driver.findOne({ driverName: id });
 
-    const user = await User.findById(id)
-    const email = user.email
+      const userId = findApp._id;
 
-    const findApp = await Driver.findOne({driverName: id})
+      await Driver.findByIdAndDelete(userId);
 
-    const userId =  findApp._id
-
-
-    await Driver.findByIdAndDelete(userId)
-
-
-    const transporter = nodemailer.createTransport({
-          service: 'gmail', 
-          auth: { user: process.env.EMAIL_USER, 
-                 pass: process.env.EMAIL_PASSWORD  
-          }
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASSWORD,
+        },
       });
-     
-    
-        // Send verification code to user's email
-        const mailOptions = {
-          from: process.env.EMAIL_USER,
-          to: email,
-          subject: 'Driver Application ',
-          text: `Your application as driver for Kalichanngu transport services has been rejected`,
-        };
-    
-        await transporter.sendMail(mailOptions);
+
+      // Send verification code to user's email
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "Driver Application ",
+        text: `Your application as driver for Kalichanngu transport services has been rejected`,
+      };
+
+      await transporter.sendMail(mailOptions);
+
+      res.json({ msg: "user will be emailed" });
+    } catch (error) {
+      res.json({ msg: `try again later` });
+    }
+  })
+);
+
+AdminUsersRoute.get(
+  "/admin_all_drivers",
+  verifyMainAdmin,
+  mainAdmin,
+  asyncHandler(async (req, res) => {
+    try {
+      const drivers = await User.find({ role: 11 });
+
+      res.json(drivers);
+    } catch (error) {
+      res.json({ msg: "try again later" });
+    }
+  })
+);
 
 
-        res.json({msg: "user will be emailed"})
-    
-
-    
-  } catch (error) {
-    res.json({msg: `try again later`})
-  }
-
-
-}))
 
 module.exports = AdminUsersRoute;

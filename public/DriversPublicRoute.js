@@ -234,6 +234,7 @@ DriversPublicRoute.get(
           driverCarPlate: driver.driverCarPlate,
           driverCarCapacity: driver.driverCarCapacity,
           driverCarPhoto: driver.driverCarPhoto,
+          drivingLicence: driver.drivingLicence,
           driverId: driver._id,
           vehicleType: driver.vehicleType,
           taxiType: driver.taxiType
