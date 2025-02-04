@@ -28,6 +28,7 @@ const UserFirstRoute = require('./userRoutes/UserFirstRoute')
 const NotsEndP = require('./notifications/NotsEndP')
 const AdminAuthRoute = require('./adminRoutes/AdminAuthRoute')
 const AdminUsersRoute = require('./adminRoutes/AdminUsersRoute')
+const AdminTaxisRoute = require('./adminRoutes/AdminTaxisRoute')
 
 
 
@@ -87,6 +88,7 @@ app.use(UserFirstRoute)
 app.use(NotsEndP)
 app.use(AdminAuthRoute)
 app.use(AdminUsersRoute)
+app.use(AdminTaxisRoute)
 
 
 
