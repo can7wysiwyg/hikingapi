@@ -35,4 +35,21 @@ try {
 
 })
 
+
+AdminTaxisRoute.get('/admin_private_taxi_single/:id', verifyMainAdmin, mainAdmin,  async(req, res) => {
+
+try {
+    const {id}  = req.params
+
+    const singlePrivateTaxi = await Ride.findById(id)
+
+    res.json(singlePrivateTaxi)
+    
+} catch (error) {
+    res.json({msg: "there was a problem"})
+}
+
+
+})
+
 module.exports = AdminTaxisRoute

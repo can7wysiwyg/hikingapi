@@ -237,7 +237,10 @@ DriversPublicRoute.get(
           drivingLicence: driver.drivingLicence,
           driverId: driver._id,
           vehicleType: driver.vehicleType,
-          taxiType: driver.taxiType
+          taxiType: driver.taxiType,
+        
+
+
         
         };
   

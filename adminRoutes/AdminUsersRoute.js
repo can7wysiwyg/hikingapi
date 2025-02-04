@@ -154,5 +154,22 @@ AdminUsersRoute.get(
 );
 
 
+AdminUsersRoute.get('/admin_get_driver/:id', verifyMainAdmin, mainAdmin, async(req, res) => {
+
+try {
+  const {id} = req.params
+
+  const singleDriver = await Driver.findById(id)
+
+  res.json(singleDriver)
+  
+} catch (error) {
+  res.json({msg: "there was a problem! try again later"})
+}
+
+
+} )
+
+
 
 module.exports = AdminUsersRoute;
