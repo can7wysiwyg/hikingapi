@@ -1,7 +1,9 @@
 const AdminTaxisRoute = require('express').Router()
 const Ride = require('../models/RideModel')
+const SharedTaxiBooking = require('../models/SharedTaxiBooking')
 const verifyMainAdmin = require('../adminmiddleware/verifyMainAdmin')
 const mainAdmin = require('../adminmiddleware/mainAdmin')
+
 
 
 
@@ -49,6 +51,23 @@ try {
     res.json({msg: "there was a problem"})
 }
 
+
+})
+
+
+// shared
+
+AdminTaxisRoute.get('/admin_shared_taxis', verifyMainAdmin, mainAdmin, async(req, res) => {
+
+try {
+
+    const sharedTaxis = await SharedTaxiBooking.find().sort({_id: -1})
+
+    res.json(sharedTaxis)
+    
+} catch (error) {
+    res.json({msg: "there was a problem"})
+}
 
 })
 
