@@ -159,6 +159,58 @@ DriverInfoRoute.put(
   })
 );
 
+
+
+
+
+DriverInfoRoute.put(
+  "/driver_licence_update/:id",
+  verify,
+  verifyDriver,
+  asyncHandler(async (req, res) => {
+    try {
+      const { id } = req.params;
+       const driver = await Driver.findOne({driverName: id});
+
+      const owned = await User.findById(req.user);
+
+      
+
+      if (driver.driverName.toString() !== owned._id.toString()) {
+        return res.json({ msg: "Access is denied." });
+      }
+
+      if (!req.files || Object.keys(req.files).length === 0) {
+        return res.json({ msg: "No files were uploaded." });
+      }
+
+      const drivingLicence = req.files.drivingLicence;
+      
+
+      if (!drivingLicence) {
+        return res.json({ msg: "No image was selected." });
+      }
+
+      const result = await cloudinary.uploader.upload(
+        drivingLicence.tempFilePath
+      );
+
+     
+      await Driver.findByIdAndUpdate(driver._id, { drivingLicence: result.secure_url });
+
+      res.json({ msg: " successfully updated." });
+    } catch (error) {
+      res.json({
+        msg: `try again later: ${error}`,
+      });
+    }
+  })
+);
+
+
+
+
+
 DriverInfoRoute.put(
   "/driver_car_info_update/:id",
   verify,
