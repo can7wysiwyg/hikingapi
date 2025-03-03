@@ -26,6 +26,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.8.2",
     "node-fetch": "^3.3.2",
-    "nodemailer": "^6.9.16"
+    "nodemailer": "^6.9.16",
+    "twilio": "^5.4.5"
   }
 }

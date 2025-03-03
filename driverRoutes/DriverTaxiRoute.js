@@ -110,7 +110,7 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
 
 
 
-  DriverTaxiRoute.get('/driver_see_my_routes/:id', verify, verifyDriver, async(req, res) => {
+  DriverTaxiRoute.get('/driver_see_my_routes/:id', async(req, res) => {
 
 
     try {
@@ -118,7 +118,7 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
 
         const driver = await Driver.findOne({driverName: id})
 
-        const myRoutes = await TaxiRoute.find({taxiId: driver._id})
+        const myRoutes = await TaxiRoute.findOne({taxiId: driver._id})
 
         res.json(myRoutes)
         

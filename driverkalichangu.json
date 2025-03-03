@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "60604214836",
+    "project_id": "kalichangu",
+    "storage_bucket": "kalichangu.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:60604214836:android:101179dcb66c3cff9e6461",
+        "android_client_info": {
+          "package_name": "com.can1996.driver"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdp8aOV_WrBInQ1U2gpkWK9YQHwZTMpvI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:60604214836:android:ecf40909d8d111a69e6461",
+        "android_client_info": {
+          "package_name": "com.can1996.passenger"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdp8aOV_WrBInQ1U2gpkWK9YQHwZTMpvI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
