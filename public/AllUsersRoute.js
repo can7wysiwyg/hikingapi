@@ -7,7 +7,7 @@ const asyncHandler = require('express-async-handler')
 AllUsersRoute.get('/show_all_users', verify,  asyncHandler(async (req, res) => {
     try {
       
-      const users = await User.find().select('fullname _id userLocation');
+      const users = await User.find().select('fullname _id userLocation email phone');
   
       res.json(users); 
     } catch (error) {
@@ -22,7 +22,7 @@ try {
 
   const {id} = req.params
 
-  const user = await User.findOne({_id: id}).select('fullname _id userLocation');
+  const user = await User.findOne({_id: id}).select('fullname _id userLocation email phone');
 
 
   res.json({user})
