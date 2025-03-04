@@ -95,7 +95,7 @@ TaxiRoutePublic.post('/book_taxi', verify, async (req, res) => {
       await sharedTaxiBooking.save();
 
       // Send notifications
-      await SharedTaxiNotificationServices.sendSharedTaxiNotification(driverId, newBooking);
+      // await SharedTaxiNotificationServices.sendSharedTaxiNotification(driverId, newBooking);
 
       return res.status(201).json({
           success: true,
