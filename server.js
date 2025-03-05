@@ -29,6 +29,7 @@ const NotsEndP = require('./notifications/NotsEndP')
 const AdminAuthRoute = require('./adminRoutes/AdminAuthRoute')
 const AdminUsersRoute = require('./adminRoutes/AdminUsersRoute')
 const AdminTaxisRoute = require('./adminRoutes/AdminTaxisRoute')
+const TripCountRoute = require('./driverRoutes/TripCountRoute')
 
 
 
@@ -89,7 +90,7 @@ app.use(NotsEndP)
 app.use(AdminAuthRoute)
 app.use(AdminUsersRoute)
 app.use(AdminTaxisRoute)
-
+app.use(TripCountRoute)
 
 
 
