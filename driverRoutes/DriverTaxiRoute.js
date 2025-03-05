@@ -236,16 +236,25 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
   
 
       const tripId = await TripCount.findOne({owner: driver._id})
+
       if (!tripId) {
-        return res.status(404).json({ msg: "Trip count record not found." });
+      
+        const newTrip = new TripCount({
+          owner: driver._id,
+          tripNumber: 1  
+        });
+
+        console.log(newTrip)
+        await newTrip.save();
+      } else {
+        
+        await TripCount.findByIdAndUpdate(
+          tripId._id,
+          { $inc: { tripNumber: 1 } },
+          { new: true }
+        );
       }
-      
-      await TripCount.findByIdAndUpdate(
-         tripId._id, 
-         { $inc: { tripNumber: 1 } },
-         { new: true }
-      );
-      
+
       await Ride.deleteOne({ driverId: driver._id });
   
       res.status(200).json({
