@@ -29,12 +29,6 @@ const NotsEndP = require('./notifications/NotsEndP')
 const AdminAuthRoute = require('./adminRoutes/AdminAuthRoute')
 const AdminUsersRoute = require('./adminRoutes/AdminUsersRoute')
 const AdminTaxisRoute = require('./adminRoutes/AdminTaxisRoute')
-const twilio = require('twilio');
-const client = new twilio('AC81cf61698d1c1bd256af7d25c434596d', '3fd7f69b10c0d9f407b4379c0b59fe4a');
-
-
-// 1 ACe25250bbcb03be8d0688ea76b2d35533 || a026b8b3637c22483fd918e7edb4810f   
-
 
 
 
@@ -98,19 +92,9 @@ app.use(AdminTaxisRoute)
 
 
 
-app.get('/api/twillio_test', async(req, res) => {
-  
-    
-  const restp =  client.messages.create({
-      body: `Your OTP is: }`,
-      to: +265996823344,  // recipient's phone number
-      from: +15076775792 // your Twilio number
-    })
-    .then((message) => console.log(message.sid));
-    console.log(restp)
-   res.json({msg: "hellow"})
 
-})
+
+
 
 app.get('/api/reverse-geocode', async (req, res) => {
   const { latitude, longitude } = req.query;
