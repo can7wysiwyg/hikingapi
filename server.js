@@ -95,8 +95,6 @@ app.use(TripCountRoute)
 
 
 
-
-
 app.get('/api/reverse-geocode', async (req, res) => {
   const { latitude, longitude } = req.query;
   
