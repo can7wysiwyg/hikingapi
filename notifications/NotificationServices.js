@@ -115,10 +115,21 @@ class NotificationService {
                     body: content.substring(0, 100), // Truncate content if needed
                 },
                 data: {
-                    type: 'message',
-                    conversationId: conversationId.toString(),
-                    messageId: messageId.toString(),
-                    senderId: senderId.toString()
+
+                    ustomData: JSON.stringify({
+                                                    type: 'message',
+                                                     conversationId,
+                                                     messageId,
+                                                     senderId
+                                             })
+
+
+                    // type: 'message',
+                    // conversationId: conversationId,
+                    // messageId: messageId,
+                    // senderId: senderId
+
+
                 }
             };
 
