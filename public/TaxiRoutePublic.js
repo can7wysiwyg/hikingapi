@@ -8,6 +8,7 @@ const SharedTaxiBooking = require('../models/SharedTaxiBooking')
 const NotificationTaxiServices = require('../notifications/NotificationTaxiServices')
 const User = require('../models/UserModel');
 const SharedTaxiNotificationServices = require('../notifications/SharedTaxiNotificationBooking');
+const TaxiPrivateCancelNotification = require('../notifications/TaxiPrivateCancelNotification');
 
 
 
@@ -493,6 +494,10 @@ TaxiRoutePublic.delete('/cancel_requested_ride/:id', verify, async(req, res) => 
 
     await Ride.findByIdAndDelete(id)
 
+    let taxiId = id
+    await TaxiPrivateCancelNotification(taxiId)
+
+
     res.json({msg: "Taxi has been cancelled!"})
 
 
@@ -514,6 +519,10 @@ TaxiRoutePublic.delete('/erase_non_shared_from_booking_page/:id', verify, async(
     const  singleUserRide = await Ride.findOne({userId: id})
 
     await Ride.findByIdAndDelete(singleUserRide._id)
+     
+    let taxiId = singleUserRide._id
+    
+    await TaxiPrivateCancelNotification(taxiId)
 
     res.json({msg: "cancelled successfully!!"})
 
