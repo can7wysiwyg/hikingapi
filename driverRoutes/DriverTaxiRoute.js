@@ -328,63 +328,6 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
   });
 
 
-
-
-
-
- 
-
-
-  // DriverTaxiRoute.delete('/de_board_from_shared_taxi_and_count/:userId/:driverId', verify, verifyDriver, async (req, res) => {
-  //   try {
-  //     const { userId, driverId } = req.params;
-  
-  //     // Find the SharedTaxiBooking document and update it
-  //     const updatedTaxiBooking = await SharedTaxiBooking.findOneAndUpdate(
-  //       { driverId }, // Match the taxi by driverId
-  //       { $pull: { bookings: { userId } } }, // Remove the booking with the specified userId
-  //       { new: true } // Return the updated document
-  //     );
-  
-  //     // Check if the document was found and updated
-  //     if (!updatedTaxiBooking) {
-  //       return res.status(404).json({ msg: 'No shared taxi booking found for the provided driverId.' });
-  //     }
-  
-  //     // Check if the bookings array is empty after the removal
-  //     if (updatedTaxiBooking.bookings.length === 0) {
-  //       // No bookings left, update TripCount
-  //       const tripId = await TripCount.findOne({ owner: driverId });
-  
-  //       if (!tripId) {
-  //         // Create a new trip entry if none exists
-  //         const newTrip = new TripCount({
-  //           owner: driverId,
-  //           tripNumber: 1
-  //         });
-  //         await newTrip.save();
-  //       } else {
-  //         // Increment the trip count
-  //         await TripCount.findByIdAndUpdate(
-  //           tripId._id,
-  //           { $inc: { tripNumber: 1 } },
-  //           { new: true }
-  //         );
-  //       }
-  //     }
-  
-  //     // Send success response
-  //     res.status(200).json({
-  //       msg: `Passenger was successfully deboarded.`,
-  //       updatedTaxiBooking,
-  //     });
-  //   } catch (error) {
-  //     res.status(500).json({ msg: `There was an error: ${error.message}` });
-  //   }
-  // });
-  
-
-
   // driver update route
 
   DriverTaxiRoute.put('/driver_route_update/:id', verify, verifyDriver, async(req, res) => {
