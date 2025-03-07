@@ -172,13 +172,13 @@ TaxiRoutePublic.post('/book_non_shared_taxi', verify, async (req, res) => {
 
       // Send notifications
      
-      // if (user) {
-      //     await NotificationTaxiServices.sendTaxiNotification(
+      if (user) {
+          await NotificationTaxiServices.sendTaxiNotification(
               
-      //         savedRide,
-      //         'non-shared'
-      //     );
-      // }
+              savedRide,
+              'non-shared'
+          );
+      }
 
      
       // Return success response
