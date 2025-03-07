@@ -8,25 +8,31 @@ class TaxiPrivateCancelNotification {
   static async sendTaxiPrivateCancelNotification(taxiId) {
     try {
       // Get ride details
+      console.log("taxiid", taxiId)
       const rideDetails = await Ride.findOne({_id: taxiId});
+
+      console.log("rideDetails", rideDetails)
       if (!rideDetails) {
         throw new Error('Ride not found');
       }
       
       // Get driver details
       const driver = await Driver.findOne({_id: rideDetails.driverId});
+      console.log("DRIVER", driver)
       if (!driver) {
         throw new Error('Driver not found');
       }
       
       // Get driver user account to access FCM token
       const driverUser = await User.findById(driver.driverName);
+      console.log("driveruser", driverUser)
       if (!driverUser || !driverUser.fcmToken) {
         throw new Error('Driver user account not found or missing FCM token');
       }
       
       // Get user who booked the taxi
       const booker = await User.findById(rideDetails.userId);
+      console.log("booker", "booker")
       const bookerName = booker ? booker.fullname : 'A customer';
       
       // Create notification payload
