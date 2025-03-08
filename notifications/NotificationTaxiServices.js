@@ -31,7 +31,7 @@ class NotificationTaxiServices {
                 notification: {
                     title: `${getTaxiBooker.fullname} booked Your ${type} taxi!`,
                     body: `Pickup Location: ${data.name}, ${data.state}, ${data.country}. Dropoff: ${rideDetails.dropoffLocation}. Distance: ${rideDetails.distance} km. 
-                    There details: phone number ${getTaxiBooker.phone}, email ${getTaxiBooker.email}`,
+                    Their details: phone number ${getTaxiBooker.phone}, email ${getTaxiBooker.email}`,
                 },
                 data: {
                     type: 'taxi_booking',

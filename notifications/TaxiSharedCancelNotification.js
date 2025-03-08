@@ -1,24 +1,14 @@
-const User = require('../models/UserModel');
 const Driver = require('../models/DriverModel');
-const Ride = require('../models/RideModel');
-const axios = require('axios');
+const User = require('../models/UserModel')
 const { driverApp } = require('./FirebaseInitialization');  // Path to your Firebase initialization
 
-class TaxiPrivateCancelNotification {
-  static async sendTaxiPrivateCancelNotification(taxiId) {
+class TaxiSharedCancelNotification {
+  static async sendTaxiSharedCancelNotification(driverId) {
     try {
-      // Get ride details
-      
-      const rideDetails = await Ride.findOne({_id: taxiId});
+     
+        const driver = await Driver.findOne({_id: driverId});
+              
 
-      
-      if (!rideDetails) {
-        throw new Error('Ride not found');
-      }
-      
-      // Get driver details
-      const driver = await Driver.findOne({_id: rideDetails.driverId});
-      
       if (!driver) {
         throw new Error('Driver not found');
       }
@@ -30,21 +20,17 @@ class TaxiPrivateCancelNotification {
         throw new Error('Driver user account not found or missing FCM token');
       }
       
-      // Get user who booked the taxi
-      const booker = await User.findById(rideDetails.userId);
-      
-      const bookerName = booker ? booker.fullname : 'A customer';
       
       // Create notification payload
       const notificationPayload = {
         token: driverUser.fcmToken,
         notification: {
           title: 'Ride Cancelled',
-          body: `${bookerName} has cancelled their taxi booking (ID: ${rideDetails.confirmationCode || taxiId.substring(0, 8)})`
+          body: `The ride has been cancelled by the passenger.`
         },
         data: {
           type: 'ride_cancelled',
-          rideId: taxiId.toString(),
+          rideId: driverId.toString(),
           timestamp: new Date().toISOString()
         }
       };
@@ -81,4 +67,4 @@ class TaxiPrivateCancelNotification {
   }
 }
 
-module.exports = TaxiPrivateCancelNotification;
+module.exports = TaxiSharedCancelNotification;

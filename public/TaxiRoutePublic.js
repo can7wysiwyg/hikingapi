@@ -9,6 +9,7 @@ const NotificationTaxiServices = require('../notifications/NotificationTaxiServi
 const User = require('../models/UserModel');
 const SharedTaxiNotificationServices = require('../notifications/SharedTaxiNotificationBooking');
 const TaxiPrivateCancelNotification = require('../notifications/TaxiPrivateCancelNotification');
+const TaxiSharedCancelNotification = require('../notifications/TaxiSharedCancelNotification');
 
 
 
@@ -355,7 +356,7 @@ TaxiRoutePublic.get('/taxi_occupancy_all',  async (req, res) => {
   
 
 
-  TaxiRoutePublic.put('/cancel_shared_taxi_order/:driverId/:userId', verify, async (req, res) => {
+  TaxiRoutePublic.put('/cancel_shared_taxi_order/:driverId/:userId',  async (req, res) => {
     try {
       const { driverId, userId } = req.params;
 
@@ -382,6 +383,9 @@ TaxiRoutePublic.get('/taxi_occupancy_all',  async (req, res) => {
           userAlreadyBooked: false,
         });
       }
+ 
+      await TaxiSharedCancelNotification.sendTaxiSharedCancelNotification(driverId)
+
   
       // Remove the user from the bookings array
       sharedTaxi.bookings.splice(userIndex, 1);
@@ -492,19 +496,23 @@ TaxiRoutePublic.delete('/cancel_requested_ride/:id', verify, async(req, res) => 
 
     const {id} = req.params
 
-    await Ride.findByIdAndDelete(id)
 
     let taxiId = id
-    await TaxiPrivateCancelNotification(taxiId)
+    await TaxiPrivateCancelNotification.sendTaxiPrivateCancelNotification(taxiId);
 
 
+    await Ride.findByIdAndDelete(id)
+
+    
+    
     res.json({msg: "Taxi has been cancelled!"})
 
 
 
     
   } catch (error) {
-    res.json({ msg: `An unexpected error occurred while  deleting route: ${error}` });
+    console.log("this is private cancel errro", error)
+    res.json({ msg: `prob: ${error}` });
   }
 
 })
@@ -518,11 +526,14 @@ TaxiRoutePublic.delete('/erase_non_shared_from_booking_page/:id', verify, async(
 
     const  singleUserRide = await Ride.findOne({userId: id})
 
-    await Ride.findByIdAndDelete(singleUserRide._id)
-     
     let taxiId = singleUserRide._id
     
-    await TaxiPrivateCancelNotification(taxiId)
+    await TaxiPrivateCancelNotification.sendTaxiPrivateCancelNotification(taxiId);
+
+
+    await Ride.findByIdAndDelete(singleUserRide._id)
+     
+    
 
     res.json({msg: "cancelled successfully!!"})
 

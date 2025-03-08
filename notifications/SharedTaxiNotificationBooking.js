@@ -6,22 +6,19 @@ class SharedTaxiNotificationServices {
   static async sendSharedTaxiNotification(driverId, newBooking) {
     try {
       // Fetch driver details
-      console.log("newbooking", newBooking)
-      console.log("driverId", driverId)
       
       const getDriver = await Driver.findOne({_id: driverId});
-      console.log("getDriver", getDriver)
+      
       const driver = await User.findById(getDriver.driverName);
 
-      console.log("driver", driver)
+      
       if (!driver) {
         throw new Error('Driver not found in the database');
       }
 
       // Fetch user details
       const user = await User.findById(newBooking.userId);
-      console.log("user", user)
-      if (!user) {
+            if (!user) {
         throw new Error('User not found in the database');
       }
 
@@ -31,7 +28,7 @@ class SharedTaxiNotificationServices {
       // Send notification to the user
       await this.sendNotificationToUser(user, newBooking, driverId);
 
-      console.log('Shared taxi notifications sent to driver and user');
+      
     } catch (error) {
       console.error('Error sending shared taxi notification:', error);
       throw error;
