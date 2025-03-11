@@ -49,62 +49,141 @@ DriverTaxiRoute.put(
 
 
 
-DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) => {
-  try {
+// DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) => {
+//   try {
     
-      const alreadyExists = await Driver.findOne({ driverName: req.user.id });
+//       const alreadyExists = await Driver.findOne({ driverName: req.user.id });
 
-      const found = alreadyExists._id
+//       const found = alreadyExists._id
 
-      const checkTaxi = await TaxiRoute.findOne({taxiId: found})
+//       const checkTaxi = await TaxiRoute.findOne({taxiId: found})
 
-      if(checkTaxi) {
-        return res.json({msg: "you have a route already"})
-      } 
-
-
+//       if(checkTaxi) {
+//         return res.json({msg: "you have a route already"})
+//       } 
 
 
-    const { taxiId, routeName, startLocation, endLocation, fare } = req.body;
 
-    
-    if (!taxiId || !routeName || !startLocation || !endLocation || !fare) {
-      return res.status(400).json({ success: false, message: 'All fields are required' });
-    }
+
+//     const { taxiId, routeName, startLocation, endLocation, fare } = req.body;
 
     
-    if (
-      !startLocation.coordinates || !Array.isArray(startLocation.coordinates.coordinates) ||
-      startLocation.coordinates.coordinates.length !== 2 ||
-      !startLocation.placeName ||
-      !endLocation.coordinates || !Array.isArray(endLocation.coordinates.coordinates) ||
-      endLocation.coordinates.coordinates.length !== 2 ||
-      !endLocation.placeName
-    ) {
-      return res.status(400).json({ success: false, message: 'Invalid location data' });
-    }
+//     if (!taxiId || !routeName || !startLocation || !endLocation || !fare) {
+//       return res.status(400).json({ success: false, message: 'All fields are required' });
+//     }
 
     
-    const route = new TaxiRoute({
-      taxiId,
-      routeName,
-      startLocation,
-      endLocation,
-      fare,
-    });
+//     if (
+//       !startLocation.coordinates || !Array.isArray(startLocation.coordinates.coordinates) ||
+//       startLocation.coordinates.coordinates.length !== 2 ||
+//       !startLocation.placeName ||
+//       !endLocation.coordinates || !Array.isArray(endLocation.coordinates.coordinates) ||
+//       endLocation.coordinates.coordinates.length !== 2 ||
+//       !endLocation.placeName
+//     ) {
+//       return res.status(400).json({ success: false, message: 'Invalid location data' });
+//     }
+
+    
+//     const route = new TaxiRoute({
+//       taxiId,
+//       routeName,
+//       startLocation,
+//       endLocation,
+//       fare,
+//     });
 
 
   
 
     
-    await route.save();
+//     await route.save();
 
     
-    res.status(201).json({ success: true, message: 'Route created successfully', route });
+//     res.status(201).json({ success: true, message: 'Route created successfully', route });
 
 
+//   } catch (error) {
+//     console.error('Error in backend:', error);  // Log the error
+//     res.status(500).json({ success: false, message: 'Internal server error' });
+//   }
+// });
+
+
+
+DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) => {
+  try {
+    // Check if driver already has a route
+    const alreadyExists = await Driver.findOne({ driverName: req.user.id });
+    const found = alreadyExists._id;
+    const checkTaxi = await TaxiRoute.findOne({ taxiId: found });
+    if (checkTaxi) {
+      return res.json({ msg: "You have a route already" });
+    }
+
+    const { taxiId, isLongDistance, routeName, destinationArea, startLocation, endLocation, fare } = req.body;
+    
+    // Validate required fields for all routes
+    if (!taxiId || !fare) {
+      return res.status(400).json({ success: false, message: 'Taxi ID and fare are required' });
+    }
+
+    // Initialize the route object with common fields
+    const routeData = {
+      taxiId,
+      fare
+    };
+
+    // Handle long-distance routes
+    if (isLongDistance) {
+      // Validate long-distance specific fields
+      if (!routeName || !startLocation || !endLocation) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Route name, start location, and end location are required for long-distance routes' 
+        });
+      }
+
+      // Validate location data
+      if (
+        !startLocation.coordinates || !Array.isArray(startLocation.coordinates.coordinates) ||
+        startLocation.coordinates.coordinates.length !== 2 || !startLocation.placeName ||
+        !endLocation.coordinates || !Array.isArray(endLocation.coordinates.coordinates) ||
+        endLocation.coordinates.coordinates.length !== 2 || !endLocation.placeName
+      ) {
+        return res.status(400).json({ success: false, message: 'Invalid location data' });
+      }
+
+      // Add long-distance specific fields
+      routeData.routeName = routeName;
+      routeData.startLocation = startLocation;
+      routeData.endLocation = endLocation;
+    } 
+    // Handle local routes
+    else {
+      // Validate local route specific fields
+      if (!routeName || !destinationArea) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Route name and destination area are required for local routes' 
+        });
+      }
+
+      // Add local route specific fields
+      routeData.routeName = routeName;
+      routeData.destinationArea = destinationArea;
+    }
+
+    const route = new TaxiRoute(routeData);
+    await route.save();
+    
+    res.status(201).json({ 
+      success: true, 
+      message: 'Route created successfully', 
+      route 
+    });
   } catch (error) {
-    console.error('Error in backend:', error);  // Log the error
+    console.error('Error in backend:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
