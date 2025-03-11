@@ -203,7 +203,7 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
     const { taxiId, isLongDistance, routeName, destinationArea, startLocation, endLocation, fare } = req.body;
     
     // Validate required fields for all routes
-    if (!taxiId || !routeName || !fare) {
+    if (!taxiId || !fare) {
       return res.status(400).json({ success: false, message: 'Taxi ID, route name, and fare are required' });
     }
 
