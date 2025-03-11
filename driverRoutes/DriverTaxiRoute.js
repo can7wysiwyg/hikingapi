@@ -111,6 +111,85 @@ DriverTaxiRoute.put(
 
 
 
+// DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) => {
+//   try {
+//     // Check if driver already has a route
+//     const alreadyExists = await Driver.findOne({ driverName: req.user.id });
+//     const found = alreadyExists._id;
+//     const checkTaxi = await TaxiRoute.findOne({ taxiId: found });
+//     if (checkTaxi) {
+//       return res.json({ msg: "You have a route already" });
+//     }
+
+//     const { taxiId, isLongDistance, routeName, destinationArea, startLocation, endLocation, fare } = req.body;
+    
+//     // Validate required fields for all routes
+//     if (!taxiId || !fare) {
+//       return res.status(400).json({ success: false, message: 'Taxi ID and fare are required' });
+//     }
+
+//     // Initialize the route object with common fields
+//     const routeData = {
+//       taxiId,
+//       fare
+//     };
+
+//     // Handle long-distance routes
+//     if (isLongDistance) {
+//       // Validate long-distance specific fields
+//       if (!routeName || !startLocation || !endLocation) {
+//         return res.status(400).json({ 
+//           success: false, 
+//           message: 'Route name, start location, and end location are required for long-distance routes' 
+//         });
+//       }
+
+//       // Validate location data
+//       if (
+//         !startLocation.coordinates || !Array.isArray(startLocation.coordinates.coordinates) ||
+//         startLocation.coordinates.coordinates.length !== 2 || !startLocation.placeName ||
+//         !endLocation.coordinates || !Array.isArray(endLocation.coordinates.coordinates) ||
+//         endLocation.coordinates.coordinates.length !== 2 || !endLocation.placeName
+//       ) {
+//         return res.status(400).json({ success: false, message: 'Invalid location data' });
+//       }
+
+//       // Add long-distance specific fields
+//       routeData.routeName = routeName;
+//       routeData.startLocation = startLocation;
+//       routeData.endLocation = endLocation;
+//     } 
+//     // Handle local routes
+//     else {
+//       // Validate local route specific fields
+//       if (!routeName || !destinationArea) {
+//         return res.status(400).json({ 
+//           success: false, 
+//           message: 'Route name and destination area are required for local routes' 
+//         });
+//       }
+
+//       // Add local route specific fields
+//       routeData.routeName = routeName;
+//       routeData.destinationArea = destinationArea;
+//     }
+
+//     const route = new TaxiRoute(routeData);
+//     await route.save();
+    
+//     res.status(201).json({ 
+//       success: true, 
+//       message: 'Route created successfully', 
+//       route 
+//     });
+//   } catch (error) {
+//     console.error('Error in backend:', error);
+//     res.status(500).json({ success: false, message: 'Internal server error' });
+//   }
+// });
+
+
+// Updated POST endpoint for driver routes
 DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) => {
   try {
     // Check if driver already has a route
@@ -124,23 +203,24 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
     const { taxiId, isLongDistance, routeName, destinationArea, startLocation, endLocation, fare } = req.body;
     
     // Validate required fields for all routes
-    if (!taxiId || !fare) {
-      return res.status(400).json({ success: false, message: 'Taxi ID and fare are required' });
+    if (!taxiId || !routeName || !fare) {
+      return res.status(400).json({ success: false, message: 'Taxi ID, route name, and fare are required' });
     }
 
     // Initialize the route object with common fields
     const routeData = {
       taxiId,
+      routeName,
       fare
     };
 
     // Handle long-distance routes
-    if (isLongDistance) {
+    if (!isLongDistance) {
       // Validate long-distance specific fields
-      if (!routeName || !startLocation || !endLocation) {
+      if (!startLocation || !endLocation ) {
         return res.status(400).json({ 
           success: false, 
-          message: 'Route name, start location, and end location are required for long-distance routes' 
+          message: 'Start location and end location are required for long-distance routes' 
         });
       }
 
@@ -155,22 +235,20 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
       }
 
       // Add long-distance specific fields
-      routeData.routeName = routeName;
       routeData.startLocation = startLocation;
       routeData.endLocation = endLocation;
     } 
     // Handle local routes
     else {
       // Validate local route specific fields
-      if (!routeName || !destinationArea) {
+      if (!destinationArea) {
         return res.status(400).json({ 
           success: false, 
-          message: 'Route name and destination area are required for local routes' 
+          message: 'Destination area is required for local routes' 
         });
       }
 
       // Add local route specific fields
-      routeData.routeName = routeName;
       routeData.destinationArea = destinationArea;
     }
 
