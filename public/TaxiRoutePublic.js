@@ -49,6 +49,22 @@ TaxiRoutePublic.get('/taxi_route/:id',  async(req, res) => {
 }
 
   })
+
+
+  TaxiRoutePublic.get('/taxi_all_routes', async(req, res) => {
+
+    try{
+
+      const allRoutes = await TaxiRoute.find()
+
+      res.json({allRoutes})
+
+    } catch(error) {
+      
+      res.json({msg: "try again later"})
+    }
+
+  })
   
 
   const generateConfirmationCode = () => {
