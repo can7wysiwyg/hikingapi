@@ -235,7 +235,7 @@ TaxiRoutePublic.post('/book_non_shared_taxi', verify, async (req, res) => {
 
 
 
-TaxiRoutePublic.get('/taxi_occupancy/:driverId', verify, async (req, res) => {
+TaxiRoutePublic.get('/taxi_occupancy/:driverId', verify,  async (req, res) => {
     try {
         const { driverId } = req.params;  // Extract driverId from URL parameters
 

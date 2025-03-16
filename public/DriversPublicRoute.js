@@ -64,11 +64,12 @@ DriversPublicRoute.get('/taxis_going_long_distance', asyncHandler(async (req, re
         const taxiIdValues = taxiIds.map(item => item.taxiId);
         const drivers = await Driver.find({ 
           approvedItem: true,
-          _id: { $in: taxiIdValues }
+          _id: { $in: taxiIdValues },
+          taxiType: "shared"
         });
         return res.json({ taxis: drivers });
       } else {
-        const drivers = await Driver.find({ approvedItem: true });
+        const drivers = await Driver.find({ approvedItem: true, taxiType: "shared" });
         return res.json({ taxis: drivers });
       }
     }
@@ -96,13 +97,14 @@ DriversPublicRoute.get('/taxis_going_long_distance', asyncHandler(async (req, re
       {
         $match: { 
           approvedItem: true,
-          _id: { $in: taxiIdValues }
+          _id: { $in: taxiIdValues },
+          taxiType: "shared"
         },
       },
       {
         $sort: { distance: 1 }, // Sort by distance (nearest first)
       },
-    ]);
+    ])
     
     res.status(200).json({ taxis: nearbyDriversGoingToDestination });
     
