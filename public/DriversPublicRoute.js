@@ -1,6 +1,7 @@
 const DriversPublicRoute = require('express').Router()
 const User = require('../models/UserModel')
 const Driver = require('../models/DriverModel')
+const TaxiRoute = require('../models/TaxiRouteModel')
 const asyncHandler = require('express-async-handler')
 const harvesine = require('haversine-distance')
 
@@ -49,6 +50,67 @@ DriversPublicRoute.get('/taxis_show_all', asyncHandler(async (req, res) => {
 }));
 
 
+
+
+DriversPublicRoute.get('/taxis_going_long_distance', asyncHandler(async (req, res) => {
+  try {
+    const {districtQuery, latitude, longitude} = req.query;
+    const MAX_DISTANCE_KM = 30;
+
+    // If no latitude or longitude is provided, return all taxis going to the requested district
+    if (!latitude || !longitude || !districtQuery) {
+      if (districtQuery) {
+        const taxiIds = await TaxiRoute.find({destinationArea: districtQuery}).select("taxiId");
+        const taxiIdValues = taxiIds.map(item => item.taxiId);
+        const drivers = await Driver.find({ 
+          approvedItem: true,
+          _id: { $in: taxiIdValues }
+        });
+        return res.json({ taxis: drivers });
+      } else {
+        const drivers = await Driver.find({ approvedItem: true });
+        return res.json({ taxis: drivers });
+      }
+    }
+
+    // Convert to float and ensure they're numbers
+    const passengerLocation = {
+      type: "Point", // GeoJSON type
+      coordinates: [parseFloat(longitude), parseFloat(latitude)], // Longitude, Latitude in that order
+    };
+
+    // Find taxi IDs going to the requested district
+    const taxisGoingToDestination = await TaxiRoute.find({destinationArea: districtQuery}).select("taxiId");
+    const taxiIdValues = taxisGoingToDestination.map(item => item.taxiId);
+    
+    // Find drivers that are going to the requested district AND are within range
+    const nearbyDriversGoingToDestination = await Driver.aggregate([
+      {
+        $geoNear: {
+          near: passengerLocation,
+          distanceField: "distance",
+          maxDistance: MAX_DISTANCE_KM * 1000, // Convert km to meters
+          spherical: true,
+        },
+      },
+      {
+        $match: { 
+          approvedItem: true,
+          _id: { $in: taxiIdValues }
+        },
+      },
+      {
+        $sort: { distance: 1 }, // Sort by distance (nearest first)
+      },
+    ]);
+    
+    res.status(200).json({ taxis: nearbyDriversGoingToDestination });
+    
+  } catch (error) {
+    console.log("there was a problem getting taxis by district", error);
+    res.status(500).json({msg: "there was a problem getting taxis by district", error: error.message });
+  }
+}));
 
 
 
