@@ -6,7 +6,6 @@ const temporaryUserSchema = new mongoose.Schema({
   password: { type: String, required: true },
   phone: { type: String, required: true },
   verificationCode: { type: Number, required: true },
-  tokenExpires: { type: Date },
   createdAt: { type: Date, default: Date.now, expires: 600 }, // Document expires after 10 minutes
 });
 
