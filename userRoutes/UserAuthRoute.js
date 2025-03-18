@@ -158,10 +158,10 @@ UserAuth.post("/user_register", asyncHandler(async (req, res) => {
     
     // Create verification URL
     // This should be your backend URL
-    const verificationUrl = `${process.env.BACKEND_URL}/verify_email/${verificationToken}`;
+    const verificationUrl = `${process.env.BACKEND_URL}/verify_email/${verificationCode}`;
     
     // Create deep link to your app
-    const appDeepLink = `yourapp://login`;
+    // const appDeepLink = `yourapp://Login`;
     
     // Send verification link to user's email
     const mailOptions = {
@@ -173,6 +173,7 @@ UserAuth.post("/user_register", asyncHandler(async (req, res) => {
         <p>Thank you for registering. Please click the link below to activate your account:</p>
         <a href="${verificationUrl}">Activate Account</a>
         <p>This link will expire in 10 minutes.</p>
+            
       `,
     };
     await transporter.sendMail(mailOptions);
@@ -191,7 +192,7 @@ UserAuth.get("/verify_email/:token", asyncHandler(async (req, res) => {
     
     // Retrieve the user from the TemporaryUser collection
     const tempUser = await TemporaryUser.findOne({ 
-      verificationToken: token,
+      verificationCode: token,
       tokenExpires: { $gt: Date.now() } // Check if token hasn't expired
     });
     
