@@ -135,7 +135,7 @@ UserAuth.post("/user_register", asyncHandler(async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     
     // Generate a verification token (rather than a code)
-    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const verificationCode = crypto.randomBytes(32).toString('hex');
     
     // Save user in the TemporaryUser collection
     const tempUser = new TemporaryUser({
@@ -143,7 +143,7 @@ UserAuth.post("/user_register", asyncHandler(async (req, res) => {
       email,
       password: hashedPassword,
       phone,
-      verificationToken,
+      verificationCode,
       tokenExpires: Date.now() + 10 * 60 * 1000, // 10 minutes expiration
     });
     await tempUser.save();
