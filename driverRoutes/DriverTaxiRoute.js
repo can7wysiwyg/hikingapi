@@ -383,6 +383,37 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
       res.status(500).json({msg: `Problem updating: ${error.message}`})
     }
   })
+
+
+
+  DriverTaxiRoute.delete('/driver_erase_my_route/:id', verify, verifyDriver, async(req, res) => {
+
+    try {
+      const {id} = req.params
+
+      const findDriver = await Driver.findOne({driverName: id})
+
+      if(!findDriver) {
+        return res.json({msg: "there was a problem"})
+      }
+
+      const TaxiId = findDriver?.driverName
+
+      const taxiId  = await TaxiRoute.findOne({taxiId: TaxiId})
+
+      const routeId = taxiId?._id
+
+      await TaxiRoute.findByIdAndDelete(routeId)
+
+      res.json({msg: `Successfully deleted..`})
+      
+    } catch (error) {
+      console.log(`problem with deleting the route: ${error}`)
+      res.json({msg: `problem with deleting the route: ${error}`})
+    }
+
+
+  })
   
  
   module.exports = DriverTaxiRoute
