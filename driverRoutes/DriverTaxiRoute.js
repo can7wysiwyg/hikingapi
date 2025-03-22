@@ -385,25 +385,30 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
   })
 
 
-
-  DriverTaxiRoute.delete('/driver_erase_my_route/:id', verify, verifyDriver, async(req, res) => {
+  // verify, verifyDriver,
+  DriverTaxiRoute.delete('/driver_erase_my_route/:id', async(req, res) => {
 
     try {
       const {id} = req.params
 
       const findDriver = await Driver.findOne({driverName: id})
 
+      
       if(!findDriver) {
         return res.json({msg: "there was a problem"})
       }
 
-      const TaxiId = findDriver?.driverName
+      const TaxiId = findDriver._id
+
+    
 
       const taxiId  = await TaxiRoute.findOne({taxiId: TaxiId})
+  
 
       const routeId = taxiId?._id
 
-      await TaxiRoute.findByIdAndDelete(routeId)
+      
+       await TaxiRoute.findByIdAndDelete(routeId)
 
       res.json({msg: `Successfully deleted..`})
       
