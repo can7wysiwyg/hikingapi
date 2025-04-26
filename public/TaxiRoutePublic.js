@@ -2,7 +2,6 @@ const TaxiRoutePublic = require('express').Router()
 const TaxiRoute = require("../models/TaxiRouteModel");
 const Ride = require('../models/RideModel')
 const verify = require('../middleware/verify')
-const ConfirmationCode = require('../models/TaxiConfirmationModel')
 const Driver = require('../models/DriverModel')
 const SharedTaxiBooking = require('../models/SharedTaxiBooking')
 const NotificationTaxiServices = require('../notifications/NotificationTaxiServices')
@@ -79,43 +78,43 @@ TaxiRoutePublic.post('/book_taxi', verify, async (req, res) => {
   try {
       const { userId, driverId, pickUpLocation, dropoff } = req.body;
 
-      // Validate required fields
+    
       if (!userId || !driverId || !pickUpLocation || !dropoff) {
           return res.status(400).json({ msg: "Fields cannot be empty" });
       }
 
-      // Fetch driver details to confirm taxi type
+      
       const driver = await Driver.findById(driverId);
       if (!driver) {
           return res.status(404).json({ msg: "Driver not found" });
       }
 
-      // Ensure the driver is for a shared taxi
+      
       if (driver.taxiType !== 'shared') {
           return res.status(400).json({ msg: "Only shared taxis are supported" });
       }
 
       const sharedTaxiCapacity = parseInt(driver.driverCarCapacity, 10);
 
-      // Fetch or create a shared taxi entry in SharedTaxiBooking model
+      
       let sharedTaxiBooking = await SharedTaxiBooking.findOne({ driverId });
       if (!sharedTaxiBooking) {
           sharedTaxiBooking = new SharedTaxiBooking({
               driverId,
               taxiCapacity: sharedTaxiCapacity,
-              bookings: [], // Initialize an empty array for confirmation codes
+              bookings: [], 
           });
       }
 
-      // Check if the taxi has reached its capacity
+      
       if (sharedTaxiBooking.bookings.length >= sharedTaxiCapacity) {
           return res.status(400).json({ msg: "Taxi is fully booked" });
       }
 
-      // Generate a unique confirmation code
+    
       const confirmationCode = generateConfirmationCode();
 
-      // Add the new booking to the shared taxi's confirmation codes array
+      
       const newBooking = {
           confirmationCode,
           userId,
@@ -158,7 +157,7 @@ TaxiRoutePublic.post('/book_non_shared_taxi', verify, async (req, res) => {
           time,
       } = req.body;
 
-      // Validate required fields
+      
       if (
           !userId ||
           !driverId ||
@@ -171,21 +170,21 @@ TaxiRoutePublic.post('/book_non_shared_taxi', verify, async (req, res) => {
           return res.status(400).json({ msg: 'Fields cannot be empty' });
       }
 
-      // Fetch driver details
+      
       const driver = await Driver.findById(driverId);
       if (!driver) {
           return res.status(404).json({ msg: 'Driver not found' });
       }
 
-      // Ensure the taxi is non-shared
+      
       if (driver.taxiType !== 'non-shared') {
           return res.status(400).json({ msg: 'This driver is not assigned to a non-shared taxi' });
       }
 
-      // Generate a unique confirmation code
+      
       const confirmationCode = generateConfirmationCode();
 
-      // Create and save the new ride
+      
       const newRide = new Ride({
           userId,
           driverId,
@@ -195,7 +194,7 @@ TaxiRoutePublic.post('/book_non_shared_taxi', verify, async (req, res) => {
           distance,
           time,
           confirmationCode,
-          rideStatus: 'requested', // Initial ride status
+          rideStatus: 'requested', 
       });
       const user = await User.findById(userId);
 
@@ -213,7 +212,7 @@ TaxiRoutePublic.post('/book_non_shared_taxi', verify, async (req, res) => {
       }
 
      
-      // Return success response
+      
       return res.status(201).json({
           success: true,
           message: 'Non-shared taxi booked successfully!',
@@ -237,44 +236,44 @@ TaxiRoutePublic.post('/book_non_shared_taxi', verify, async (req, res) => {
 
 TaxiRoutePublic.get('/taxi_occupancy/:driverId', verify,  async (req, res) => {
     try {
-        const { driverId } = req.params;  // Extract driverId from URL parameters
+        const { driverId } = req.params;  
 
         
-        // Fetch the shared taxi booking entry using the driverId
+        
         const sharedTaxi = await SharedTaxiBooking.findOne({ driverId });
         
         if (!sharedTaxi) {
-            // If no shared taxi booking exists, return 200 with no bookings and the driver's capacity
+          
             const driver = await Driver.findById(driverId);
             if (!driver) {
                 return res.status(404).json({ msg: "Driver not found" });
             }
-            const maxCapacity = parseInt(driver.driverCarCapacity, 10);  // Get the driver's taxi capacity
+            const maxCapacity = parseInt(driver.driverCarCapacity, 10);  
 
             return res.status(200).json({
                 success: true,
-                currentOccupancy: 0,  // No bookings yet
-                maxCapacity,          // Include driver's capacity
+                currentOccupancy: 0,  
+                maxCapacity,          
                 message: "Taxi is available, waiting for passengers."
             });
         }
 
-        // Get the current number of bookings (length of bookings array)
+      
         const currentOccupancy = sharedTaxi.bookings.length;
 
-        // Get the maximum capacity of the taxi (from the driver model)
+      
         const driver = await Driver.findById(driverId);
         if (!driver) {
             return res.status(404).json({ msg: "Driver not found" });
         }
 
-        const maxCapacity = parseInt(driver.driverCarCapacity, 10);  // Get the driver's taxi capacity
+        const maxCapacity = parseInt(driver.driverCarCapacity, 10);  
 
-        // Send the current occupancy, max capacity, and driver's capacity as response
+        
         res.status(200).json({
             success: true,
             currentOccupancy,
-            maxCapacity,           // Send the maxCapacity as part of the response
+            maxCapacity,           
         });
     } catch (error) {
         console.error('Error fetching taxi occupancy:', error);
@@ -309,18 +308,18 @@ TaxiRoutePublic.get('/taxi_occupancy_all',  async (req, res) => {
     try {
       const { driverId, userId } = req.params;
   
-      // Find the taxi by driverId
+    
       const sharedTaxi = await SharedTaxiBooking.findOne({ driverId });
   
       if (!sharedTaxi) {
-        // No bookings exist for this taxi yet
+      
         return res.status(200).json({
           msg: "No bookings exist for this taxi yet.",
           userAlreadyBooked: false
         });
       }
   
-      // Check if the user already has a booking
+    
       const userAlreadyBooked = sharedTaxi.bookings.some(
         (booking) => booking.userId.toString() === userId
       );
@@ -340,20 +339,20 @@ TaxiRoutePublic.get('/taxi_occupancy_all',  async (req, res) => {
 
       const { userId } = req.params;
 
-      // Find all shared taxi bookings that involve this user
+      
       const sharedTaxis = await SharedTaxiBooking.find({
         "bookings.userId": userId,
       });
   
       if (sharedTaxis.length === 0) {
-        // No bookings exist for this user
+        
         return res.status(200).json({
           msg: "User has not booked any shared taxi.",
           userAlreadyBooked: false,
         });
       }
   
-      // For each shared taxi, find the user's specific booking and return the details
+    
       const userBookings = sharedTaxis.map((taxi) => {
         const booking = taxi.bookings.find(
           (booking) => booking.userId.toString() === userId
@@ -365,7 +364,7 @@ TaxiRoutePublic.get('/taxi_occupancy_all',  async (req, res) => {
           pickUpLocation: booking.pickUpLocation,
           dropoff: booking.dropoff,
           _id: booking._id,
-          status: booking.status,  // Optional: Return the status if needed (e.g., "confirmed", "in transit")
+          status: booking.status, 
         };
       });
   
@@ -392,7 +391,7 @@ TaxiRoutePublic.get('/taxi_occupancy_all',  async (req, res) => {
 
     
   
-      // Find the shared taxi by driverId
+    
       const sharedTaxi = await SharedTaxiBooking.findOne({ driverId });
   
       if (!sharedTaxi) {
@@ -402,7 +401,7 @@ TaxiRoutePublic.get('/taxi_occupancy_all',  async (req, res) => {
         });
       }
   
-      // Check if the user is in the bookings array
+      
       const userIndex = sharedTaxi.bookings.findIndex(
         (booking) => booking.userId.toString() === userId
       );
@@ -417,10 +416,10 @@ TaxiRoutePublic.get('/taxi_occupancy_all',  async (req, res) => {
       await TaxiSharedCancelNotification.sendTaxiSharedCancelNotification(driverId)
 
   
-      // Remove the user from the bookings array
+    
       sharedTaxi.bookings.splice(userIndex, 1);
   
-      // Save the updated shared taxi document
+      
       await sharedTaxi.save();
   
       res.status(200).json({
@@ -470,27 +469,27 @@ try {
     const { id } = req.params;
 
     try {
-        // Look for requested rides
+  
         const requestedRides = await Ride.find({
             userId: id,
             status: 'requested',
         });
 
-        // If there are requested rides, return them
+      
         if (requestedRides.length > 0) {
             return res.status(200).json(requestedRides);
         }
 
-        // If no requested rides, check for any rides
+      
         const allRides = await Ride.find({
             userId: id,
         });
 
         if (allRides.length > 0) {
-            return res.status(200).json(allRides);  // Return other rides
+            return res.status(200).json(allRides);  
         }
 
-        // If no rides exist at all, return a friendly message and empty array
+        
         res.status(200).json({
             message: 'No rides found for the user.',
             rides: [],

@@ -19,17 +19,17 @@ DriverInfoRoute.post(
 
   asyncHandler(async (req, res) => {
     try {
-      // Check if driver already exists
+    
       const alreadyExists = await Driver.findOne({ driverName: req.user.id });
 
       if (alreadyExists) {
         return res.json({ msg: "Action not possible! You are already registered!" });
       }
 
-      // Destructure fields from the request body
+      
       const { driverCarPlate, driverCarCapacity, vehicleType, taxiType } = req.body;
 
-      // Validate required fields
+      
       if (!driverCarPlate) {
         return res.json({ msg: "Car number plate cannot be empty" });
       }
@@ -48,7 +48,7 @@ DriverInfoRoute.post(
         return res.json({ msg: "Taxi type cannot be empty" });
       }
 
-      // Validate photo fields
+    
       if (
         !req.files ||
         !req.files.driverCarPhoto ||
@@ -57,7 +57,7 @@ DriverInfoRoute.post(
         return res.json({ msg: "All photos (Car Photo" });
       }
 
-      // Create a new driver object
+      
       const driver = new Driver({
         driverCarCapacity,
         driverCarPlate,
@@ -66,7 +66,7 @@ DriverInfoRoute.post(
         taxiType,
       });
 
-      // Upload all photos to Cloudinary
+      
       const uploadToCloudinary = async (file) => {
         const result = await cloudinary.uploader.upload(file.tempFilePath);
         return result.secure_url;
@@ -75,7 +75,7 @@ DriverInfoRoute.post(
       driver.driverCarPhoto = await uploadToCloudinary(req.files.driverCarPhoto);
       driver.drivingLicence = await uploadToCloudinary(req.files.drivingLicence);
       
-      // Save the driver object
+      
       await driver.save();
 
       res.json({ msg: "We Will Get Back To You..." });

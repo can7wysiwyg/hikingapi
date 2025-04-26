@@ -49,6 +49,13 @@ const DriverSchema = mongoose.Schema({
 
       },
 
+      ableToBorrow: {
+        type: Boolean,
+        default: false
+
+ 
+      },
+
       
 
     drivingLicence: {

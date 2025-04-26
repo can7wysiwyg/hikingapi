@@ -18,21 +18,21 @@ DriverTaxiRoute.put(
     try {
       const { tripId, driverId } = req.params;
 
-      // Check if the driver exists in the Ride collection
+  
       const ride = await Ride.findOne({ _id: tripId, driverId: driverId });
 
       if (!ride) {
         return res.status(404).json({ msg: "Ride or driver does not exist" });
       }
 
-      // Ensure the rideStatus is appropriate for starting a trip
+    
       if (ride.rideStatus !== 'requested') {
         return res.status(400).json({
           msg: `Ride status is '${ride.rideStatus}' and cannot be started.`,
         });
       }
 
-      // Update the ride status to "in transit"
+      
       ride.rideStatus = 'in transit';
       await ride.save();
 
@@ -51,10 +51,10 @@ DriverTaxiRoute.put(
 
 
 
-// Updated POST endpoint for driver routes
+
 DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) => {
   try {
-    // Check if driver already has a route
+    
     const alreadyExists = await Driver.findOne({ driverName: req.user.id });
     const found = alreadyExists._id;
     const checkTaxi = await TaxiRoute.findOne({ taxiId: found });
@@ -64,21 +64,21 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
 
     const { taxiId, isLongDistance, routeName, destinationArea, startLocation, endLocation, fare } = req.body;
     
-    // Validate required fields for all routes
+  
     if (!taxiId || !fare) {
       return res.status(400).json({ success: false, message: 'Taxi ID, route name, and fare are required' });
     }
 
-    // Initialize the route object with common fields
+    
     const routeData = {
       taxiId,
       routeName,
       fare
     };
 
-    // Handle long-distance routes
+  
     if (!isLongDistance) {
-      // Validate long-distance specific fields
+      
       if (!startLocation || !endLocation ) {
         return res.status(400).json({ 
           success: false, 
@@ -86,7 +86,7 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
         });
       }
 
-      // Validate location data
+      
       if (
         !startLocation.coordinates || !Array.isArray(startLocation.coordinates.coordinates) ||
         startLocation.coordinates.coordinates.length !== 2 || !startLocation.placeName ||
@@ -96,13 +96,13 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
         return res.status(400).json({ success: false, message: 'Invalid location data' });
       }
 
-      // Add long-distance specific fields
+    
       routeData.startLocation = startLocation;
       routeData.endLocation = endLocation;
     } 
-    // Handle local routes
+    
     else {
-      // Validate local route specific fields
+      
       if (!destinationArea) {
         return res.status(400).json({ 
           success: false, 
@@ -110,7 +110,7 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
         });
       }
 
-      // Add local route specific fields
+      
       routeData.destinationArea = destinationArea;
     }
 
@@ -151,13 +151,13 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
   })
 
 
-  // de-boarding passenger(s)
+
 
   DriverTaxiRoute.get('/show_boarded_taxi_to_owner/:id', verify, verifyDriver,   async (req, res) => {
     try {
       const { id } = req.params;
   
-      // Check if the driver exists
+      
       const driverExists = await Driver.findOne({ driverName: id });
       if (!driverExists) {
         return res.status(404).json({ msg: "Driver does not exist" });
@@ -198,19 +198,19 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
     try {
       const { id } = req.params;
   
-      // Find the driver by their name
+      
       const driver = await Driver.findOne({ driverName: id });
       if (!driver) {
         return res.status(404).json({ msg: "Driver not found" });
       }
   
-      // Verify ownership
+    
       const owned = await User.findById(req.user);
       if (!owned || driver.driverName.toString() !== owned._id.toString()) {
         return res.status(403).json({ msg: "Access is denied." });
       }
   
-      // Check for passengers linked to the driver
+    
       const passenger = await Ride.findOne({ driverId: driver._id });
       if (!passenger) {
         return res.status(404).json({ msg: "No passenger has boarded this taxi." });
@@ -235,19 +235,19 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
     try {
       const { id } = req.params;
   
-      // Find the driver by their name
+      
       const driver = await Driver.findOne({ driverName: id });
       if (!driver) {
         return res.status(404).json({ msg: "Driver not found" });
       }
   
-      // Verify ownership
+      
       const owned = await User.findById(req.user);
       if (!owned || driver.driverName.toString() !== owned._id.toString()) {
         return res.status(403).json({ msg: "Access is denied." });
       }
   
-      // Check for passengers linked to the driver
+      
       const passenger = await Ride.findOne({ driverId: driver._id });
       if (!passenger) {
         return res.status(404).json({ msg: "No passenger has boarded this taxi." });
@@ -289,44 +289,38 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
 
 
 
-
-
-
-
-
-
   
   DriverTaxiRoute.delete('/de_board_from_shared_taxi/:userId/:driverId', verify, verifyDriver, async (req, res) => {
     try {
 
       const { userId, driverId } = req.params;
   
-      // Find the SharedTaxiBooking document and update it
+      
       const updatedTaxiBooking = await SharedTaxiBooking.findOneAndUpdate(
-        { driverId }, // Match the taxi by driverId
-        { $pull: { bookings: { userId } } }, // Remove the booking with the specified userId
-        { new: true } // Return the updated document
+        { driverId }, 
+        { $pull: { bookings: { userId } } }, 
+        { new: true } 
       );
   
-      // Check if the document was found and updated
+      //
       if (!updatedTaxiBooking) {
         return res.status(404).json({ msg: 'No shared taxi booking found for the provided driverId.' });
       }
   
-      // Check if the bookings array is empty after the removal
+      
       if (updatedTaxiBooking.bookings.length === 0) {
-        // No bookings left, update TripCount
+        
         const tripId = await TripCount.findOne({ owner: driverId });
   
         if (!tripId) {
-          // Create a new trip entry if none exists
+        
           const newTrip = new TripCount({
             owner: driverId,
             tripNumber: 1
           });
           await newTrip.save();
         } else {
-          // Increment the trip count
+          
           await TripCount.findByIdAndUpdate(
             tripId._id,
             { $inc: { tripNumber: 1 } },
@@ -335,7 +329,7 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
         }
       }
   
-      // Send success response
+      
       res.status(200).json({
         msg: `Passenger was successfully deboarded.`,
         updatedTaxiBooking,
@@ -347,7 +341,7 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
   });
 
 
-  // driver update route
+
 
   DriverTaxiRoute.put('/driver_route_update/:id', verify, verifyDriver, async(req, res) => {
     try {
@@ -385,8 +379,8 @@ DriverTaxiRoute.post('/driver/routes', verify, verifyDriver, async (req, res) =>
   })
 
 
-  // verify, verifyDriver,
-  DriverTaxiRoute.delete('/driver_erase_my_route/:id', async(req, res) => {
+
+  DriverTaxiRoute.delete('/driver_erase_my_route/:id', verify, verifyDriver, async(req, res) => {
 
     try {
       const {id} = req.params
