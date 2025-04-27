@@ -348,6 +348,7 @@ DriversPublicRoute.get(
           driverId: driver._id,
           vehicleType: driver.vehicleType,
           taxiType: driver.taxiType,
+          ableToBorrow: driver.ableToBorrow
         
 
 
