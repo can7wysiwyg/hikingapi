@@ -15,7 +15,7 @@ DriversPublicRoute.get('/taxis_show_all', asyncHandler(async (req, res) => {
   try {
     
     if (!latitude || !longitude) {
-      const drivers = await Driver.find({ approvedItem: true });
+      const drivers = await Driver.find({ approvedItem: true, ableToBorrow: false });
       return res.json({ taxis: drivers });
     }
 
@@ -114,7 +114,7 @@ DriversPublicRoute.get('/taxis_going_long_distance', asyncHandler(async (req, re
         });
         return res.json({ taxis: drivers });
       } else {
-        const drivers = await Driver.find({ approvedItem: true, taxiType: "shared" });
+        const drivers = await Driver.find({ approvedItem: true, taxiType: "shared", ableToBorrow: false });
         return res.json({ taxis: drivers });
       }
     }
@@ -142,6 +142,7 @@ DriversPublicRoute.get('/taxis_going_long_distance', asyncHandler(async (req, re
       {
         $match: { 
           approvedItem: true,
+          ableToBorrow: false,
           _id: { $in: taxiIdValues },
           taxiType: "shared"
         },
@@ -170,7 +171,7 @@ DriversPublicRoute.get('/taxis_show_all_from_search', asyncHandler(async (req, r
   try {
     
     if (!latitude || !longitude) {
-      const drivers = await Driver.find({ approvedItem: true });
+      const drivers = await Driver.find({ approvedItem: true, ableToBorrow: false });
       return res.json({ taxis: drivers });
     }
 
@@ -191,7 +192,7 @@ DriversPublicRoute.get('/taxis_show_all_from_search', asyncHandler(async (req, r
         },
       },
       {
-        $match: { approvedItem: true }, 
+        $match: { approvedItem: true, ableToBorrow: false }, 
       },
       {
         $sort: { distance: 1 }, 
@@ -214,7 +215,7 @@ DriversPublicRoute.get('/taxis_show_taxi_type_non', asyncHandler(async (req, res
   try {
     
     if (!latitude || !longitude) {
-      const drivers = await Driver.find({ approvedItem: true, taxiType: "non-shared" });
+      const drivers = await Driver.find({ approvedItem: true, taxiType: "non-shared", ableToBorrow: false });
       return res.json({ taxis: drivers });
     }
 
@@ -235,7 +236,7 @@ DriversPublicRoute.get('/taxis_show_taxi_type_non', asyncHandler(async (req, res
         },
       },
       {
-        $match: { approvedItem: true, taxiType: "non-shared" }, 
+        $match: { approvedItem: true, taxiType: "non-shared", ableToBorrow: false }, 
       },
       {
         $sort: { distance: 1 }, 
@@ -258,7 +259,7 @@ DriversPublicRoute.get('/taxis_show_taxi_type_shared', asyncHandler(async (req, 
   try {
 
     if (!latitude || !longitude) {
-      const drivers = await Driver.find({ approvedItem: true, taxiType: "shared" });
+      const drivers = await Driver.find({ approvedItem: true, taxiType: "shared", ableToBorrow: false });
       return res.json({ taxis: drivers });
     }
 
@@ -279,7 +280,7 @@ DriversPublicRoute.get('/taxis_show_taxi_type_shared', asyncHandler(async (req, 
         },
       },
       {
-        $match: { approvedItem: true, taxiType: "shared" }, 
+        $match: { approvedItem: true, taxiType: "shared", ableToBorrow: false }, 
       },
       {
         $sort: { distance: 1 }, 
