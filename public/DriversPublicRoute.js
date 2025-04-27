@@ -36,7 +36,7 @@ DriversPublicRoute.get('/taxis_show_all', asyncHandler(async (req, res) => {
         },
       },
       {
-        $match: { approvedItem: true }, 
+        $match: { approvedItem: true, ableToBorrow: false }, 
       },
       {
         $sort: { distance: 1 }, 
