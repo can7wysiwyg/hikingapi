@@ -198,22 +198,12 @@ UserAuth.get("/verify", asyncHandler(async (req, res) => {
       <body>
         <div class="container">
           <h1 class="success">Email Successfully Verified!</h1>
-          <p>Your account has been verified. You can now use the app.</p>
-          <a href="passenger://Login?verified=true" class="button">Open App</a>
+          <p>Your account has been verified. You can now go back to the app to login.</p>
           
-          <p style="margin-top: 40px;">If the button doesn't work, make sure you have the app installed.</p>
+          
         </div>
         
-        <script>
-          // Attempt to open the app automatically
-          window.location.href = "passenger://Login?verified=true";
-          
-          // Fallback for iOS
-          setTimeout(function() {
-            // If still on this page after timeout, user might not have the app
-            // You could redirect to app store or show additional instructions
-          }, 2000);
-        </script>
+       
       </body>
       </html>
     `);
