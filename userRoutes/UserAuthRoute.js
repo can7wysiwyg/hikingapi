@@ -172,14 +172,101 @@ UserAuth.get("/verify", asyncHandler(async (req, res) => {
     // Remove the user from the TemporaryUser collection
     await TemporaryUser.deleteOne({ email });
 
-    // Redirect to the login page in the app
-    // For React Native, we need to use deep linking or a custom URL scheme
-    res.redirect(`passenger://Login?verified=true`);
+    // Return an HTML page with a successful verification message and deep link
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Email Verified</title>
+        <style>
+          body { font-family: Arial, sans-serif; text-align: center; padding: 40px 20px; }
+          .container { max-width: 600px; margin: 0 auto; }
+          .success { color: #28a745; }
+          .button { 
+            display: inline-block; 
+            background-color: #007bff; 
+            color: white; 
+            padding: 12px 24px; 
+            text-decoration: none; 
+            border-radius: 4px; 
+            margin-top: 20px; 
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1 class="success">Email Successfully Verified!</h1>
+          <p>Your account has been verified. You can now use the app.</p>
+          <a href="passenger://Login?verified=true" class="button">Open App</a>
+          
+          <p style="margin-top: 40px;">If the button doesn't work, make sure you have the app installed.</p>
+        </div>
+        
+        <script>
+          // Attempt to open the app automatically
+          window.location.href = "passenger://Login?verified=true";
+          
+          // Fallback for iOS
+          setTimeout(function() {
+            // If still on this page after timeout, user might not have the app
+            // You could redirect to app store or show additional instructions
+          }, 2000);
+        </script>
+      </body>
+      </html>
+    `);
   } catch (error) {
     console.error(`Error during verification: ${error.stack}`);
     res.status(500).send(`There was an error: ${error.message}`);
   }
 }));
+
+
+
+// UserAuth.get("/verify", asyncHandler(async (req, res) => {
+//   try {
+//     const { token, email } = req.query;
+
+//     if (!token || !email) {
+//       return res.status(400).send('Missing verification parameters');
+//     }
+
+//     // Retrieve the user from the TemporaryUser collection
+//     const tempUser = await TemporaryUser.findOne({ email });
+
+//     if (!tempUser) {
+//       return res.status(400).send('Verification link expired or invalid.');
+//     }
+
+//     // Check if the verification token matches
+//     if (tempUser.verificationToken !== token) {
+//       return res.status(400).send('Invalid verification link.');
+//     }
+
+//     // Move the user to the User collection
+//     const newUser = new User({
+//       fullname: tempUser.fullname,
+//       email: tempUser.email,
+//       phone: tempUser.phone,
+//       password: tempUser.password,
+//     });
+
+//     await newUser.save();
+
+//     // Remove the user from the TemporaryUser collection
+//     await TemporaryUser.deleteOne({ email });
+
+//     // Redirect to the login page in the app
+//     // For React Native, we need to use deep linking or a custom URL scheme
+//     res.redirect(`passenger://Login?verified=true`);
+//   } catch (error) {
+//     console.error(`Error during verification: ${error.stack}`);
+//     res.status(500).send(`There was an error: ${error.message}`);
+//   }
+// }));
+
 
 
 
