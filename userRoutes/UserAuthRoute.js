@@ -12,6 +12,65 @@ const nodemailer = require('nodemailer')
 
 
 
+// UserAuth.post("/user_register", asyncHandler(async (req, res) => {
+//   try {
+//     const { fullname, email, password, phone } = req.body;
+
+//     if (!fullname) return res.status(400).json({ msg: "Your name cannot be empty" });
+//     if (!email) return res.status(400).json({ msg: "Your email cannot be empty" });
+//     if (!password) return res.status(400).json({ msg: "Password cannot be empty" });
+//     if (!phone) return res.status(400).json({ msg: "Phone number cannot be empty" });
+
+//     // Check if email already exists in permanent or temporary collections
+//     const emailExists = await User.findOne({ email }) || await TemporaryUser.findOne({ email });
+//     if (emailExists) {
+//       return res.status(400).json({ msg: "The email exists, please use another" });
+//     }
+
+//     // Hash the password
+//     const hashedPassword = await bcrypt.hash(password, 10);
+
+//     // Generate a verification code
+//     const verificationCode = crypto.randomInt(100000, 999999);
+
+//     // Save user in the TemporaryUser collection
+//     const tempUser = new TemporaryUser({
+//       fullname,
+//       email,
+//       password: hashedPassword,
+//       phone,
+//       verificationCode,
+//     });
+
+//     await tempUser.save();
+
+//     const transporter = nodemailer.createTransport({
+//       service: 'gmail', 
+//       auth: { user: process.env.EMAIL_USER, 
+//              pass: process.env.EMAIL_PASSWORD  
+//       }
+//   });
+ 
+
+//     // Send verification code to user's email
+//     const mailOptions = {
+//       from: process.env.EMAIL_USER,
+//       to: email,
+//       subject: 'Email Verification Code',
+//       text: `Your verification code is: ${verificationCode}. It is valid for 10 minutes.`,
+//     };
+
+//     await transporter.sendMail(mailOptions);
+
+//     res.status(200).json({ msg: "A verification code has been sent to your email." });
+//   } catch (error) {
+//     console.error(`Error during registration: ${error.stack}`);
+//     res.status(500).json({ msg: `There was an error: ${error.message}` });
+//   }
+// }));
+
+
+
 UserAuth.post("/user_register", asyncHandler(async (req, res) => {
   try {
     const { fullname, email, password, phone } = req.body;
@@ -30,8 +89,8 @@ UserAuth.post("/user_register", asyncHandler(async (req, res) => {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Generate a verification code
-    const verificationCode = crypto.randomInt(100000, 999999);
+    // Generate a unique verification token (better than using a code)
+    const verificationToken = crypto.randomBytes(32).toString('hex');
 
     // Save user in the TemporaryUser collection
     const tempUser = new TemporaryUser({
@@ -39,30 +98,39 @@ UserAuth.post("/user_register", asyncHandler(async (req, res) => {
       email,
       password: hashedPassword,
       phone,
-      verificationCode,
+      verificationToken, // Store token instead of code
     });
 
     await tempUser.save();
 
     const transporter = nodemailer.createTransport({
       service: 'gmail', 
-      auth: { user: process.env.EMAIL_USER, 
-             pass: process.env.EMAIL_PASSWORD  
+      auth: { 
+        user: process.env.EMAIL_USER, 
+        pass: process.env.EMAIL_PASSWORD  
       }
-  });
- 
+    });
 
-    // Send verification code to user's email
+    // Create verification link
+    // You need to replace this with your actual app/server URL
+    const verificationLink = `https://hikingapi.onrender.com/verify?token=${verificationToken}&email=${encodeURIComponent(email)}`;
+    
+    // Send verification link to user's email
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
-      subject: 'Email Verification Code',
-      text: `Your verification code is: ${verificationCode}. It is valid for 10 minutes.`,
+      subject: 'Email Verification Link',
+      html: `
+        <h1>Welcome to the App!</h1>
+        <p>Please click the link below to verify your email address:</p>
+        <a href="${verificationLink}">Verify Your Email</a>
+        <p>This link is valid for 10 minutes.</p>
+      `,
     };
 
     await transporter.sendMail(mailOptions);
 
-    res.status(200).json({ msg: "A verification code has been sent to your email." });
+    res.status(200).json({ msg: "A verification link has been sent to your email." });
   } catch (error) {
     console.error(`Error during registration: ${error.stack}`);
     res.status(500).json({ msg: `There was an error: ${error.message}` });
@@ -71,24 +139,24 @@ UserAuth.post("/user_register", asyncHandler(async (req, res) => {
 
 
 
-UserAuth.post("/verify_email", asyncHandler(async (req, res) => {
+UserAuth.get("/verify", asyncHandler(async (req, res) => {
   try {
-    const { email, verificationCode } = req.body;
+    const { token, email } = req.query;
 
-    if (!email || !verificationCode) {
-      return res.status(400).json({ msg: "Email and verification code are required." });
+    if (!token || !email) {
+      return res.status(400).send('Missing verification parameters');
     }
 
     // Retrieve the user from the TemporaryUser collection
     const tempUser = await TemporaryUser.findOne({ email });
 
     if (!tempUser) {
-      return res.status(400).json({ msg: "Verification code expired or invalid." });
+      return res.status(400).send('Verification link expired or invalid.');
     }
 
-    // Check if the verification code matches
-    if (tempUser.verificationCode !== parseInt(verificationCode, 10)) {
-      return res.status(400).json({ msg: "Invalid verification code." });
+    // Check if the verification token matches
+    if (tempUser.verificationToken !== token) {
+      return res.status(400).send('Invalid verification link.');
     }
 
     // Move the user to the User collection
@@ -104,12 +172,56 @@ UserAuth.post("/verify_email", asyncHandler(async (req, res) => {
     // Remove the user from the TemporaryUser collection
     await TemporaryUser.deleteOne({ email });
 
-    res.status(201).json({ msg: "Email verified, account created successfully! Please Login" });
+    // Redirect to the login page in the app
+    // For React Native, we need to use deep linking or a custom URL scheme
+    res.redirect(`passenger://Login?verified=true`);
   } catch (error) {
     console.error(`Error during verification: ${error.stack}`);
-    res.status(500).json({ msg: `There was an error: ${error.message}` });
+    res.status(500).send(`There was an error: ${error.message}`);
   }
 }));
+
+
+
+// UserAuth.post("/verify_email", asyncHandler(async (req, res) => {
+//   try {
+//     const { email, verificationCode } = req.body;
+
+//     if (!email || !verificationCode) {
+//       return res.status(400).json({ msg: "Email and verification code are required." });
+//     }
+
+//     // Retrieve the user from the TemporaryUser collection
+//     const tempUser = await TemporaryUser.findOne({ email });
+
+//     if (!tempUser) {
+//       return res.status(400).json({ msg: "Verification code expired or invalid." });
+//     }
+
+//     // Check if the verification code matches
+//     if (tempUser.verificationCode !== parseInt(verificationCode, 10)) {
+//       return res.status(400).json({ msg: "Invalid verification code." });
+//     }
+
+//     // Move the user to the User collection
+//     const newUser = new User({
+//       fullname: tempUser.fullname,
+//       email: tempUser.email,
+//       phone: tempUser.phone,
+//       password: tempUser.password,
+//     });
+
+//     await newUser.save();
+
+//     // Remove the user from the TemporaryUser collection
+//     await TemporaryUser.deleteOne({ email });
+
+//     res.status(201).json({ msg: "Email verified, account created successfully! Please Login" });
+//   } catch (error) {
+//     console.error(`Error during verification: ${error.stack}`);
+//     res.status(500).json({ msg: `There was an error: ${error.message}` });
+//   }
+// }));
 
 
 
