@@ -155,8 +155,6 @@ UserAuth.get("/verify", asyncHandler(async (req, res) => {
 
 
 
-
-
 UserAuth.post("/user_login", asyncHandler(async(req, res) => {
   const { email, password } = req.body;
 
@@ -226,95 +224,6 @@ UserAuth.get('/auth/user',verify, asyncHandler(async(req, res) => {
 
 
 
-
-  // UserAuth.post('/user_forgot_password', asyncHandler(async (req, res) => {
-  //   try {
-  //     const { email } = req.body;
-  
-  //     if (!email) {
-  //       return res.status(400).json({ msg: "Field cannot be empty." });
-  //     }
-  
-  //     const user = await User.findOne({ email });
-  
-  //     if (!user) {
-  //       return res.status(404).json({ msg: "No user with this email address exists." });
-  //     }
-  
-  //           const verificationCode = crypto.randomInt(100000, 999999); // 6-digit code
-  //     const codeExpiration = Date.now() + 3600000; // Code valid for 1 hour
-  
-      
-  //     user.passwordResetCode = verificationCode;
-  //     user.passwordResetCodeExpires = codeExpiration;
-  //     await user.save();
-  
-      
-  //     const transporter = nodemailer.createTransport({
-  //       service: 'gmail',
-  //       auth: {
-  //         user: process.env.EMAIL_USER,
-  //         pass: process.env.EMAIL_PASSWORD,
-  //       },
-  //     });
-  
-  //     const mailOptions = {
-  //       from: process.env.EMAIL_USER,
-  //       to: email,
-  //       subject: 'Password Reset Code',
-  //       text: `Your password reset code is: ${verificationCode}. It will expire in 1 hour.`,
-  //     };
-  
-  //     await transporter.sendMail(mailOptions);
-  
-  //     res.status(200).json({ msg: "Password reset code sent to your email." });
-  
-  //   } catch (error) {
-  //     res.status(500).json({ msg: `There was a problem: ${error.message}` });
-  //   }
-  // }));
-
-
-
-  // UserAuth.post('/reset_password', asyncHandler(async (req, res) => {
-  //   try {
-  //     const { email, newPassword, code } = req.body;
-  
-  //     if (!email || !newPassword || !code) {
-  //       return res.status(400).json({ msg: "Fields cannot be empty." });
-  //     }
-  
-  //     const user = await User.findOne({ email });
-  
-  //     if (!user) {
-  //       return res.status(404).json({ msg: "No user with this email address exists." });
-  //     }
-  
-  //     // Check if the code matches and is not expired
-  //     if (user.passwordResetCode !== parseInt(code) || Date.now() > user.passwordResetCodeExpires) {
-  //       return res.status(400).json({ msg: "Invalid or expired code." });
-  //     }
-  
-  //     // Hash the new password and update the user's record
-  //     const salt = await bcrypt.genSalt(10);
-  //     const hashedPassword = await bcrypt.hash(newPassword, salt);
-  //     user.password = hashedPassword;
-  
-  //     // Clear the reset code and expiration
-  //     user.passwordResetCode = null;
-  //     user.passwordResetCodeExpires = null;
-  
-  //     await user.save();
-  
-  //     res.status(200).json({ msg: "Password reset successfully. Please Login" });
-  
-  //   } catch (error) {
-  //     res.status(500).json({ msg: `There was a problem: ${error.message}` });
-  //   }
-  // }));
-
-
-
   UserAuth.post('/user_forgot_password', asyncHandler(async (req, res) => {
     try {
       const { email } = req.body;
@@ -329,11 +238,11 @@ UserAuth.get('/auth/user',verify, asyncHandler(async(req, res) => {
         return res.status(404).json({ msg: "No user with this email address exists." });
       }
   
-      // Generate a password reset token (similar to verification token)
+      
       const resetToken = crypto.randomBytes(32).toString('hex');
-      const resetTokenExpires = Date.now() + 3600000; // Token valid for 1 hour
+      const resetTokenExpires = Date.now() + 3600000; 
   
-      // Save the token and expiration to the user
+     
       user.passwordResetToken = resetToken;
       user.passwordResetTokenExpires = resetTokenExpires;
       await user.save();
@@ -346,7 +255,7 @@ UserAuth.get('/auth/user',verify, asyncHandler(async(req, res) => {
         },
       });
   
-      // Create reset password link (similar to verification link)
+     
       const resetLink = `https://hikingapi.onrender.com/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
   
       const mailOptions = {
@@ -372,8 +281,7 @@ UserAuth.get('/auth/user',verify, asyncHandler(async(req, res) => {
     }
   }));
   
-  // New GET endpoint to serve the password reset form
-  UserAuth.get('/reset-password', asyncHandler(async (req, res) => {
+    UserAuth.get('/reset-password', asyncHandler(async (req, res) => {
     try {
       const { token, email } = req.query;
   
@@ -381,7 +289,7 @@ UserAuth.get('/auth/user',verify, asyncHandler(async(req, res) => {
         return res.status(400).send('Missing reset password parameters');
       }
   
-      // Check if user exists and token is valid
+      
       const user = await User.findOne({ 
         email,
         passwordResetToken: token,
@@ -392,248 +300,7 @@ UserAuth.get('/auth/user',verify, asyncHandler(async(req, res) => {
         return res.status(400).send('Password reset link expired or invalid.');
       }
   
-      // Serve the password reset form
-      // res.send(`
-      //   <!DOCTYPE html>
-      //   <html>
-      //   <head>
-      //     <meta charset="utf-8">
-      //     <meta name="viewport" content="width=device-width, initial-scale=1">
-      //     <title>Reset Your Password</title>
-      //     <style>
-      //       body { font-family: Arial, sans-serif; text-align: center; padding: 40px 20px; }
-      //       .container { max-width: 600px; margin: 0 auto; }
-      //       .form-group { margin-bottom: 20px; }
-      //       .form-control { 
-      //         width: 100%; 
-      //         padding: 10px; 
-      //         border: 1px solid #ddd; 
-      //         border-radius: 4px; 
-      //       }
-      //       .btn-primary { 
-      //         background-color: #007bff; 
-      //         color: white; 
-      //         border: none; 
-      //         padding: 12px 24px; 
-      //         border-radius: 4px; 
-      //         cursor: pointer; 
-      //       }
-      //       .error { color: #dc3545; margin-top: 10px; }
-      //     </style>
-      //   </head>
-      //   <body>
-      //     <div class="container">
-      //       <h1>Reset Your Password</h1>
-      //       <p>Please enter your new password below:</p>
-            
-      //       <form id="resetForm">
-      //         <div class="form-group">
-      //           <input type="password" id="password" class="form-control" placeholder="New Password" required minlength="6">
-      //         </div>
-      //         <div class="form-group">
-      //           <input type="password" id="confirm-password" class="form-control" placeholder="Confirm New Password" required minlength="6">
-      //         </div>
-      //         <button type="submit" class="btn-primary">Reset Password</button>
-      //         <p id="error-message" class="error"></p>
-      //       </form>
-      //     </div>
-          
-      //     <script>
-      //       document.getElementById('resetForm').addEventListener('submit', async (e) => {
-      //         e.preventDefault();
-              
-      //         const password = document.getElementById('password').value;
-      //         const confirmPassword = document.getElementById('confirm-password').value;
-      //         const errorElement = document.getElementById('error-message');
-              
-      //         // Check if passwords match
-      //         if (password !== confirmPassword) {
-      //           errorElement.textContent = 'Passwords do not match';
-      //           return;
-      //         }
-              
-      //         try {
-      //           const response = await fetch('/complete-reset-password', {
-      //             method: 'POST',
-      //             headers: {
-      //               'Content-Type': 'application/json',
-      //             },
-      //             body: JSON.stringify({
-      //               email: '${email}',
-      //               token: '${token}',
-      //               newPassword: password
-      //             })
-      //           });
-                
-      //           const data = await response.json();
-                
-      //           if (response.ok) {
-      //             // Replace form with success message
-      //             document.querySelector('.container').innerHTML = \`
-      //               <h1 style="color: #28a745;">Password Reset Successful!</h1>
-      //               <p>\${data.msg}</p>
-      //               <p>You can now return to the app and login with your new password.</p>
-      //             \`;
-      //           } else {
-      //             errorElement.textContent = data.msg || 'An error occurred';
-      //           }
-      //         } catch (error) {
-      //           errorElement.textContent = 'An error occurred. Please try again.';
-      //         }
-      //       });
-      //     </script>
-      //   </body>
-      //   </html>
-      // `);
-
-
-
-      // res.send(`
-      //   <!DOCTYPE html>
-      //   <html>
-      //   <head>
-      //     <meta charset="utf-8">
-      //     <meta name="viewport" content="width=device-width, initial-scale=1">
-      //     <title>Reset Your Password</title>
-      //     <style>
-      //       body { font-family: Arial, sans-serif; text-align: center; padding: 40px 20px; }
-      //       .container { max-width: 600px; margin: 0 auto; }
-      //       .form-group { margin-bottom: 20px; }
-      //       .form-control { 
-      //         width: 100%; 
-      //         padding: 10px; 
-      //         border: 1px solid #ddd; 
-      //         border-radius: 4px; 
-      //       }
-      //       .btn-primary { 
-      //         background-color: #007bff; 
-      //         color: white; 
-      //         border: none; 
-      //         padding: 12px 24px; 
-      //         border-radius: 4px; 
-      //         cursor: pointer; 
-      //         position: relative;
-      //         min-width: 160px;
-      //       }
-      //       .btn-primary:disabled {
-      //         background-color: #6c757d;
-      //         cursor: not-allowed;
-      //       }
-      //       .error { color: #dc3545; margin-top: 10px; }
-            
-      //       /* Spinner styles */
-      //       .spinner {
-      //         display: none;
-      //         width: 20px;
-      //         height: 20px;
-      //         border: 3px solid rgba(255,255,255,.3);
-      //         border-radius: 50%;
-      //         border-top-color: white;
-      //         animation: spin 1s ease-in-out infinite;
-      //         position: absolute;
-      //         top: calc(50% - 10px);
-      //         left: calc(50% - 10px);
-      //       }
-            
-      //       @keyframes spin {
-      //         to { transform: rotate(360deg); }
-      //       }
-            
-      //       .btn-text {
-      //         transition: opacity 0.2s;
-      //       }
-            
-      //       .loading .spinner {
-      //         display: inline-block;
-      //       }
-            
-      //       .loading .btn-text {
-      //         opacity: 0;
-      //       }
-      //     </style>
-      //   </head>
-      //   <body>
-      //     <div class="container">
-      //       <h1>Reset Your Password</h1>
-      //       <p>Please enter your new password below:</p>
-            
-      //       <form id="resetForm">
-      //         <div class="form-group">
-      //           <input type="password" id="password" class="form-control" placeholder="New Password" required minlength="6">
-      //         </div>
-      //         <div class="form-group">
-      //           <input type="password" id="confirm-password" class="form-control" placeholder="Confirm New Password" required minlength="6">
-      //         </div>
-      //         <button type="submit" id="submitBtn" class="btn-primary">
-      //           <span class="btn-text">Reset Password</span>
-      //           <div class="spinner"></div>
-      //         </button>
-      //         <p id="error-message" class="error"></p>
-      //       </form>
-      //     </div>
-          
-      //     <script>
-      //       document.getElementById('resetForm').addEventListener('submit', async (e) => {
-      //         e.preventDefault();
-              
-      //         const password = document.getElementById('password').value;
-      //         const confirmPassword = document.getElementById('confirm-password').value;
-      //         const errorElement = document.getElementById('error-message');
-      //         const submitBtn = document.getElementById('submitBtn');
-              
-      //         // Check if passwords match
-      //         if (password !== confirmPassword) {
-      //           errorElement.textContent = 'Passwords do not match';
-      //           return;
-      //         }
-              
-      //         // Show loading state
-      //         submitBtn.classList.add('loading');
-      //         submitBtn.disabled = true;
-      //         errorElement.textContent = '';
-              
-      //         try {
-      //           const response = await fetch('/complete-reset-password', {
-      //             method: 'POST',
-      //             headers: {
-      //               'Content-Type': 'application/json',
-      //             },
-      //             body: JSON.stringify({
-      //               email: '${email}',
-      //               token: '${token}',
-      //               newPassword: password
-      //             })
-      //           });
-                
-      //           const data = await response.json();
-                
-      //           if (response.ok) {
-      //             // Replace form with success message
-      //             document.querySelector('.container').innerHTML = \`
-      //               <h1 style="color: #28a745;">Password Reset Successful!</h1>
-      //               <p>\${data.msg}</p>
-      //               <p>You can now return to the app and login with your new password.</p>
-      //             \`;
-      //           } else {
-      //             errorElement.textContent = data.msg || 'An error occurred';
-      //             // Remove loading state if there's an error
-      //             submitBtn.classList.remove('loading');
-      //             submitBtn.disabled = false;
-      //           }
-      //         } catch (error) {
-      //           errorElement.textContent = 'An error occurred. Please try again.';
-      //           // Remove loading state if there's an error
-      //           submitBtn.classList.remove('loading');
-      //           submitBtn.disabled = false;
-      //         }
-      //       });
-      //     </script>
-      //   </body>
-      //   </html>
-      // `);
-
-
-
+      
       res.send(`
         <!DOCTYPE html>
         <html>
@@ -830,7 +497,7 @@ UserAuth.get('/auth/user',verify, asyncHandler(async(req, res) => {
     }
   }));
   
-  // New POST endpoint to handle the password reset form submission
+  
   UserAuth.post('/complete-reset-password', asyncHandler(async (req, res) => {
     try {
       const { email, token, newPassword } = req.body;
@@ -839,7 +506,7 @@ UserAuth.get('/auth/user',verify, asyncHandler(async(req, res) => {
         return res.status(400).json({ msg: "All fields are required." });
       }
   
-      // Find user with matching email and valid token
+     
       const user = await User.findOne({
         email,
         passwordResetToken: token,
@@ -850,10 +517,9 @@ UserAuth.get('/auth/user',verify, asyncHandler(async(req, res) => {
         return res.status(400).json({ msg: "Invalid or expired password reset link." });
       }
   
-      // Hash the new password
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
       
-      // Update user's password and clear reset token fields
+      
       user.password = hashedPassword;
       user.passwordResetToken = undefined;
       user.passwordResetTokenExpires = undefined;
@@ -868,22 +534,6 @@ UserAuth.get('/auth/user',verify, asyncHandler(async(req, res) => {
     }
   }));
   
-  // Make sure to update your User schema to include these new fields
-  /*
-    Add these fields to your User schema:
-    
-    passwordResetToken: String,
-    passwordResetTokenExpires: Date,
-    
-    // You can remove these old fields if not needed anymore:
-    // passwordResetCode: Number,
-    // passwordResetCodeExpires: Date,
-  */
-  
-  
-  
-
-
   
 
 
