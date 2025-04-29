@@ -488,6 +488,152 @@ UserAuth.get('/auth/user',verify, asyncHandler(async(req, res) => {
 
 
 
+      // res.send(`
+      //   <!DOCTYPE html>
+      //   <html>
+      //   <head>
+      //     <meta charset="utf-8">
+      //     <meta name="viewport" content="width=device-width, initial-scale=1">
+      //     <title>Reset Your Password</title>
+      //     <style>
+      //       body { font-family: Arial, sans-serif; text-align: center; padding: 40px 20px; }
+      //       .container { max-width: 600px; margin: 0 auto; }
+      //       .form-group { margin-bottom: 20px; }
+      //       .form-control { 
+      //         width: 100%; 
+      //         padding: 10px; 
+      //         border: 1px solid #ddd; 
+      //         border-radius: 4px; 
+      //       }
+      //       .btn-primary { 
+      //         background-color: #007bff; 
+      //         color: white; 
+      //         border: none; 
+      //         padding: 12px 24px; 
+      //         border-radius: 4px; 
+      //         cursor: pointer; 
+      //         position: relative;
+      //         min-width: 160px;
+      //       }
+      //       .btn-primary:disabled {
+      //         background-color: #6c757d;
+      //         cursor: not-allowed;
+      //       }
+      //       .error { color: #dc3545; margin-top: 10px; }
+            
+      //       /* Spinner styles */
+      //       .spinner {
+      //         display: none;
+      //         width: 20px;
+      //         height: 20px;
+      //         border: 3px solid rgba(255,255,255,.3);
+      //         border-radius: 50%;
+      //         border-top-color: white;
+      //         animation: spin 1s ease-in-out infinite;
+      //         position: absolute;
+      //         top: calc(50% - 10px);
+      //         left: calc(50% - 10px);
+      //       }
+            
+      //       @keyframes spin {
+      //         to { transform: rotate(360deg); }
+      //       }
+            
+      //       .btn-text {
+      //         transition: opacity 0.2s;
+      //       }
+            
+      //       .loading .spinner {
+      //         display: inline-block;
+      //       }
+            
+      //       .loading .btn-text {
+      //         opacity: 0;
+      //       }
+      //     </style>
+      //   </head>
+      //   <body>
+      //     <div class="container">
+      //       <h1>Reset Your Password</h1>
+      //       <p>Please enter your new password below:</p>
+            
+      //       <form id="resetForm">
+      //         <div class="form-group">
+      //           <input type="password" id="password" class="form-control" placeholder="New Password" required minlength="6">
+      //         </div>
+      //         <div class="form-group">
+      //           <input type="password" id="confirm-password" class="form-control" placeholder="Confirm New Password" required minlength="6">
+      //         </div>
+      //         <button type="submit" id="submitBtn" class="btn-primary">
+      //           <span class="btn-text">Reset Password</span>
+      //           <div class="spinner"></div>
+      //         </button>
+      //         <p id="error-message" class="error"></p>
+      //       </form>
+      //     </div>
+          
+      //     <script>
+      //       document.getElementById('resetForm').addEventListener('submit', async (e) => {
+      //         e.preventDefault();
+              
+      //         const password = document.getElementById('password').value;
+      //         const confirmPassword = document.getElementById('confirm-password').value;
+      //         const errorElement = document.getElementById('error-message');
+      //         const submitBtn = document.getElementById('submitBtn');
+              
+      //         // Check if passwords match
+      //         if (password !== confirmPassword) {
+      //           errorElement.textContent = 'Passwords do not match';
+      //           return;
+      //         }
+              
+      //         // Show loading state
+      //         submitBtn.classList.add('loading');
+      //         submitBtn.disabled = true;
+      //         errorElement.textContent = '';
+              
+      //         try {
+      //           const response = await fetch('/complete-reset-password', {
+      //             method: 'POST',
+      //             headers: {
+      //               'Content-Type': 'application/json',
+      //             },
+      //             body: JSON.stringify({
+      //               email: '${email}',
+      //               token: '${token}',
+      //               newPassword: password
+      //             })
+      //           });
+                
+      //           const data = await response.json();
+                
+      //           if (response.ok) {
+      //             // Replace form with success message
+      //             document.querySelector('.container').innerHTML = \`
+      //               <h1 style="color: #28a745;">Password Reset Successful!</h1>
+      //               <p>\${data.msg}</p>
+      //               <p>You can now return to the app and login with your new password.</p>
+      //             \`;
+      //           } else {
+      //             errorElement.textContent = data.msg || 'An error occurred';
+      //             // Remove loading state if there's an error
+      //             submitBtn.classList.remove('loading');
+      //             submitBtn.disabled = false;
+      //           }
+      //         } catch (error) {
+      //           errorElement.textContent = 'An error occurred. Please try again.';
+      //           // Remove loading state if there's an error
+      //           submitBtn.classList.remove('loading');
+      //           submitBtn.disabled = false;
+      //         }
+      //       });
+      //     </script>
+      //   </body>
+      //   </html>
+      // `);
+
+
+
       res.send(`
         <!DOCTYPE html>
         <html>
@@ -520,6 +666,25 @@ UserAuth.get('/auth/user',verify, asyncHandler(async(req, res) => {
               cursor: not-allowed;
             }
             .error { color: #dc3545; margin-top: 10px; }
+            
+            /* Password field styles */
+            .password-container {
+              position: relative;
+              width: 100%;
+            }
+            
+            .password-toggle {
+              position: absolute;
+              right: 10px;
+              top: 50%;
+              transform: translateY(-50%);
+              border: none;
+              background: transparent;
+              cursor: pointer;
+              color: #6c757d;
+              font-size: 14px;
+              padding: 5px;
+            }
             
             /* Spinner styles */
             .spinner {
@@ -559,10 +724,16 @@ UserAuth.get('/auth/user',verify, asyncHandler(async(req, res) => {
             
             <form id="resetForm">
               <div class="form-group">
-                <input type="password" id="password" class="form-control" placeholder="New Password" required minlength="6">
+                <div class="password-container">
+                  <input type="password" id="password" class="form-control" placeholder="New Password" required minlength="6">
+                  <button type="button" class="password-toggle" id="toggle-password">Show</button>
+                </div>
               </div>
               <div class="form-group">
-                <input type="password" id="confirm-password" class="form-control" placeholder="Confirm New Password" required minlength="6">
+                <div class="password-container">
+                  <input type="password" id="confirm-password" class="form-control" placeholder="Confirm New Password" required minlength="6">
+                  <button type="button" class="password-toggle" id="toggle-confirm-password">Show</button>
+                </div>
               </div>
               <button type="submit" id="submitBtn" class="btn-primary">
                 <span class="btn-text">Reset Password</span>
@@ -573,6 +744,26 @@ UserAuth.get('/auth/user',verify, asyncHandler(async(req, res) => {
           </div>
           
           <script>
+            // Toggle password visibility functions
+            function setupPasswordToggle(passwordId, toggleId) {
+              const passwordInput = document.getElementById(passwordId);
+              const toggleButton = document.getElementById(toggleId);
+              
+              toggleButton.addEventListener('click', function() {
+                if (passwordInput.type === 'password') {
+                  passwordInput.type = 'text';
+                  toggleButton.textContent = 'Hide';
+                } else {
+                  passwordInput.type = 'password';
+                  toggleButton.textContent = 'Show';
+                }
+              });
+            }
+            
+            // Setup both password fields
+            setupPasswordToggle('password', 'toggle-password');
+            setupPasswordToggle('confirm-password', 'toggle-confirm-password');
+            
             document.getElementById('resetForm').addEventListener('submit', async (e) => {
               e.preventDefault();
               
