@@ -273,7 +273,7 @@ UserAuth.get('/auth/user',verify, asyncHandler(async(req, res) => {
   
       await transporter.sendMail(mailOptions);
   
-      res.status(200).json({ msg: "A password reset link has been sent to your email." });
+      res.status(200).json({ msg: "A password reset link has been sent to your email. Check Your Inbox or Spam." });
   
     } catch (error) {
       console.error(`Error during password reset request: ${error.stack}`);
