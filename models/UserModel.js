@@ -31,17 +31,24 @@ const UserSchema = mongoose.Schema({
         default: null
     },
     isFirstTimeUser: {
-         type: Boolean,
-          default: true 
-        
-        }, 
-
+        type: Boolean,
+        default: true
+    },
+    passwordResetToken: {
+        type: String,
+        default: null
+    },
+    passwordResetTokenExpires: {
+        type: Date,
+        default: null
+    },
+    // Keeping these for backward compatibility (can be removed later)
     passwordResetCode: {
-        type: Number, 
+        type: Number,
         default: null
     },
     passwordResetCodeExpires: {
-        type: Date, 
+        type: Date,
         default: null
     },
     fcmToken: {
